@@ -1,0 +1,425 @@
+# XtMate iOS - Progress Log
+
+## Session: January 16, 2026 - RALPH Loop Implementation
+
+### Completed Stories
+
+#### P3-013: Add room subdivision data model ✅
+**Implementation:**
+- Added `subRooms: [SubRoom]?` property to Room model
+- Added `calculateSubRoomsFromDivisionLines()` method to create SubRoom objects
+- Updated `isDivided` computed property to check subRooms (not just divisionLines)
+- Added `totalSubRoomSquareFeet` computed property for validation
+- Updated Room manual initializer in MockData.swift to include new properties
+- DivisionLine and SubRoom structs already existed with Codable conformance
+
+**Learnings:**
+- Room model changes require updating MockData.swift extension initializer
+- CGPoint Codable extension already added for DamageAnnotation, reused for division lines
+- Simple line-based room division works for single lines (horizontal/vertical split)
+- Complex multi-line division would need polygon intersection math
+
+#### P3-014: Create RoomDivisionView with floor plan ✅
+**Implementation:**
+- Created new `RoomDivisionView.swift` in Views/FloorPlan/ folder
+- Leveraged existing FloorPlanAnnotationView patterns for Canvas rendering
+- Added drag gesture for drawing division lines with tap-and-drag
+- Implemented angle snapping to 0°, 45°, 90°, 135°, 180°, 225°, 270°, 315°
+- Added mode toggle between Draw mode and Pan/Zoom mode
+- Division lines rendered as dashed orange lines with circular endpoints
+- Current line being drawn shows in red for visual feedback
+- Undo button to remove last drawn line
+- Cancel and Done buttons in toolbar
+- Shows room info (name, square footage) and line count
+
+**Key Features:**
+- Normalized coordinates (0-1 range) for division lines
+- Angle snapping with 15° tolerance threshold
+- Grid drawing (1 foot spacing)
+- Dimension labels on walls
+- Scale indicator showing zoom percentage
+- Instructions overlay that changes based on state
+
+**Learnings:**
+- Xcode 26 uses `PBXFileSystemSynchronizedRootGroup` which auto-discovers new Swift files
+- Preview macros in SwiftUI don't allow explicit `return` statements
+- Room initializer differs from expected - use MockData.swift extension initializer
+- RoomCategory uses `.livingRoom` not `.living` as the case name
+- Canvas drawing context uses SwiftUI's GraphicsContext with layer-based transformations
+
+#### P3-015: Sub-room naming and categorization ✅
+**Implementation:**
+- Created new `SubRoomNamingView.swift` in Views/FloorPlan/ folder
+- Added `SubRoomRow` component with expandable editing section
+- Added `MiniFloorPlanPreview` component showing division with labels
+- Added `DimensionLabel` helper component for displaying measurements
+- Integrated with RoomDivisionView via sheet presentation
+- Changed RoomDivisionView "Done" button to "Next" to show naming view
+
+**Key Features:**
+- Auto-generates sub-rooms from division lines with calculated dimensions
+- Shows mini floor plan preview with division lines and sub-room labels
+- Expandable list rows for editing name and category
+- Category picker with all RoomCategory options
+- Auto-suggest room type based on detected fixtures in FloorPlanData objects
+- Square footage variance warning if total differs from parent room
+- Dimension display (length/width/height in feet)
+
+**Learnings:**
+- Binding with ForEach requires `$subRooms` syntax for two-way binding
+- Category suggestion based on object detection (toilet -> bathroom, refrigerator -> kitchen)
+- Sheet presentation from NavigationStack toolbar works well for multi-step flows
+- Trailing closure warning can be fixed with explicit parameter labels
+
+#### P3-016: Add 'Divide Room' button to RoomCard ✅
+**Implementation:**
+- Extended `RoomListItem` with `squareFeet` and `isDivided` properties
+- Added `canBeDivided` computed property (> 200 SF and not already divided)
+- Added `onDivideRoom` callback to `RoomsListCard`
+- Added context menu to `RoomRow` with "Divide Room" option
+- Enhanced room row display to show square footage and "Divided" badge
+
+**Key Features:**
+- Context menu on room rows (long-press to access)
+- "Divide Room" option only shown for eligible rooms (> 200 SF, not divided)
+- Square footage now displayed in room row subtitle
+- "Divided" badge shown for rooms that have been divided
+- Callbacks passed through component hierarchy
+
+**Learnings:**
+- SwiftUI contextMenu works well for secondary actions
+- Optional closures can conditionally include menu items
+- Backward-compatible API changes with default parameter values
+- RoomListItem is a simplified DTO - full Room data needed for actual division
+
+#### P3-017: Damage annotation data model ✅
+**Implementation:**
+- Enhanced existing `DamageAnnotation` struct in ContentView.swift
+- Added `positionZ: Double?` for 3D positioning (height from floor in inches)
+- Added `affectedAreaSf: Double?` for estimated affected area
+- Added `position3D` computed property returning (x, y, z) tuple for easy access
+- Model already had all other required fields from previous implementation
+
+**Key Features:**
+- Full 3D positioning support: position (CGPoint for x,y) + positionZ (Double? for z)
+- Complete damage type enum: water, fire, smoke, mold, impact, wind, other
+- Severity levels: light, moderate, heavy
+- Affected surfaces: floor, wall, ceiling, trim, cabinetry
+- Water damage support: affectedHeightIn for water line height
+- Media attachments: photos array and audioPath for voice memo
+- Timestamps: createdAt and updatedAt
+- API compatibility: photoUrls and voiceMemoUrl computed properties
+- Codable conformance for persistence
+
+**Learnings:**
+- DamageAnnotation model was already 90% complete from earlier P3-007/P3-008 work
+- Adding optional properties with default values maintains backward compatibility
+- CGPoint already had Codable extension in codebase for serialization
+
+#### P3-018: Damage annotation UI on RoomCard ✅
+**Implementation:**
+- Created new `FloorPlanDamageAnnotationView.swift` in Views/FloorPlan/ folder
+- Full 2D floor plan rendering with Canvas (walls, doors, windows, objects)
+- Tap-to-place damage markers with normalized position calculation
+- Added `onAddDamage` callback to `RoomsListCard` and `RoomRow`
+- Added "Mark Damage" option to room context menu
+
+**Key Features:**
+- Interactive floor plan with pinch-to-zoom and pan gestures
+- Annotation mode toggle for adding new damage markers
+- DamageMarkerView shows damage type icon with color-coded circles
+- DamageAnnotationSummaryBar shows horizontal scrolling list of all annotations
+- QuickDamageAnnotationSheet for rapid damage type/severity/surface selection
+- DamageAnnotationDetailSheet for viewing and editing existing annotations
+- Coordinate conversion between normalized (0-1) and view coordinates
+- Grid overlay and dimension labels on floor plan
+- Delete annotation with confirmation alert
+
+**Supporting Components:**
+- DamageMarkerView: Visual marker with icon and color based on damage type
+- DamageAnnotationSummaryBar: Horizontal chip list of all annotations
+- QuickDamageAnnotationSheet: Quick add form with damage type, severity, surfaces
+- DamageAnnotationDetailSheet: Full detail view with edit/delete capabilities
+
+**Learnings:**
+- FloorPlanDoor/FloorPlanWindow use position/width/rotation not start/end points
+- @Previewable must be at the beginning of Preview block, before let statements
+- Coordinate conversion requires careful reverse transformation of scale/offset
+- Context menu is the right pattern for secondary room actions
+
+#### P3-019: Damage annotation detail form ✅
+**Implementation:**
+- Enhanced `QuickDamageAnnotationSheet` with comprehensive form elements
+- Enhanced `DamageAnnotationDetailSheet` with full editing capabilities
+- Added photo and voice memo attachment support
+- Created helper components for camera and photo library integration
+
+**Key Features:**
+- Damage type picker with SF Symbols icons (water, fire, smoke, mold, impact, wind, other)
+- Severity picker with color-coded segments (Light/Moderate/Heavy)
+- Multi-select toggles for affected surfaces (Floor/Wall/Ceiling/Trim/Cabinetry)
+- Water line height field (conditionally shown for water damage on walls)
+- Notes text field with multi-line support
+- Photo attachment via camera or photo library
+- Photo thumbnail grid with delete option
+- Full-screen photo viewer with swipe navigation
+- Voice memo recording with start/stop controls
+- Voice memo playback and delete functionality
+
+**Supporting Components:**
+- CameraPickerView: UIImagePickerController wrapper for camera capture
+- PhotoLibraryPickerView: PHPickerViewController wrapper for library selection
+- PhotoThumbnailView: Thumbnail display with delete button
+- PhotoViewerSheet: Full-screen photo viewing with dismiss gesture
+
+**Technical Details:**
+- Refactored DamageAnnotationDetailSheet into smaller computed properties to fix
+  Swift compiler "unable to type-check this expression" error
+- Used @ViewBuilder for conditional sections
+- Integrated with existing VoiceRecordingService API (throws, returns URL/Data)
+- Photos saved to app Documents directory with UUID-based filenames
+- Used URL(fileURLWithPath:) for file path to URL conversion
+
+**Learnings:**
+- VoiceRecordingService.startRecording() throws and returns URL
+- VoiceRecordingService.stopRecording() returns Data? (not via callback)
+- Complex SwiftUI views should be broken into smaller computed properties
+- PHPickerViewController requires PhotosUI import
+- UIImagePickerController sourceType .camera requires real device
+
+#### P3-020: Display damage annotations on RoomCard ✅
+**Implementation:**
+- Extended `RoomListItem` with `annotations: [DamageAnnotation]` property
+- Made damage count badge tappable with expand/collapse indicator
+- Added expandable annotations section below room row
+- Created `AnnotationRowView` for displaying individual annotations
+- Created `AnnotationPhotoThumbnail` for photo preview
+
+**Key Features:**
+- Tappable damage badge with chevron indicator (expand/collapse)
+- Animated expand/collapse transition
+- Expandable section shows all annotations with:
+  - Damage type icon with severity-colored background
+  - Damage type name and severity label
+  - Affected surfaces list
+  - Photo thumbnail preview (first photo if present)
+- Tap annotation row to edit via callback
+- Swipe-to-delete gesture on annotation rows
+- Callbacks for edit and delete actions passed through hierarchy
+
+**Supporting Components:**
+- AnnotationRowView: Displays damage type icon, info, and photo thumbnail
+- AnnotationPhotoThumbnail: 32x32 photo preview with fallback placeholder
+
+**Technical Details:**
+- Changed RoomListItem from `public` to internal to match DamageAnnotation visibility
+- Used `withAnimation` for smooth expand/collapse transitions
+- Added `onEditAnnotation` and `onDeleteAnnotation` callbacks to RoomsListCard
+- Nested button inside VStack to keep main row tappable while badge is separate
+
+**Learnings:**
+- Swift access control requires matching visibility for types used in public properties
+- swipeActions modifier works well for delete actions on list items
+- Nested buttons in SwiftUI require careful contentShape management
+
+#### P3-021: Voice memo recording for annotations ✅
+**Note:** Implemented as part of P3-019 (Damage annotation detail form)
+
+**Features delivered:**
+- Record button in QuickDamageAnnotationSheet and DamageAnnotationDetailSheet
+- VoiceRecordingService integration with start/stop controls
+- Recording indicator showing when recording is active
+- Voice memo playback button in detail sheet
+- Delete voice memo functionality
+- Audio files saved to Documents directory
+
+#### P3-022: Photo attachment to annotations ✅
+**Note:** Implemented as part of P3-019 (Damage annotation detail form)
+
+**Features delivered:**
+- Add Photo button with action sheet (Take Photo / Choose from Library)
+- CameraPickerView for camera capture
+- PhotoLibraryPickerView for library selection
+- Photos stored locally in app Documents directory
+- Photo thumbnail grid in annotation detail
+- PhotoViewerSheet for full-screen viewing with swipe navigation
+- Delete photo functionality
+
+---
+
+### Phase 3 Sprint Complete! ✅
+All stories P3-013 through P3-022 have been implemented:
+- Room subdivision data model and UI
+- Sub-room naming and categorization
+- Damage annotation system with 2D floor plan markers
+- Full annotation detail forms with photo and voice memo support
+- Expandable damage annotations display in room cards
+
+---
+
+## Session: January 13, 2026 - Room Division & Damage Annotation Sprint
+
+### Context
+- LiDAR capture working successfully
+- RoomPlan captures entire connected apartment as single "Living Room"
+- Need to divide captured space into individual rooms (Kitchen, Bathroom, Bedroom, etc.)
+- Need damage annotation system for marking water/fire/mold damage
+
+### Completed
+- ✅ Added Hashable conformance to Estimate and Room models
+- ✅ Fixed deprecated contentEdgeInsets warning (migrated to UIButton.Configuration)
+- ✅ App successfully running on iPad Pro 13-inch (M5)
+- ✅ LiDAR scanning recognizing walls, vertices, furniture, and main contents
+
+### Current Status
+Starting Phase 3 sprint focused on:
+1. Room division UI (split connected spaces)
+2. Damage annotation system (mark damaged areas)
+3. Photo and voice memo attachment
+
+### Architecture Decisions
+- Room subdivision will create separate Room records (not nested structure)
+- Division lines stored as array of line segments in original CapturedRoom
+- Annotations stored as array within Room model
+- Local storage using Codable + UserDefaults (no Core Data yet)
+- Photos stored in app Documents directory
+- Voice memos stored in app Documents directory
+
+### Next Story
+P3-013: Add room subdivision data model
+
+### Patterns & Learnings
+- SwiftUI List with selection binding requires Hashable conformance
+- UIButton.Configuration API is preferred over contentEdgeInsets (iOS 15+)
+- RoomPlan CapturedRoom provides walls, doors, windows, objects for analysis
+- Need to calculate bounding box from wall geometry for room dimensions
+
+### Known Issues
+None currently blocking progress.
+
+---
+
+## Session: January 16, 2026 - Phase 4 Enhancements
+
+### Context
+- Phase 3 (Room Division & Damage Annotation) COMPLETE
+- Phase 4 (Field Staff iOS Features) core implementation COMPLETE
+- Implementing remaining P4 enhancements: Photo attachment and Offline queue
+
+### Completed Stories
+
+#### P4-ENH-1: Photo Attachment for Task Completion ✅
+**Implementation:**
+- Created `TaskPhotoCapture.swift` - Reusable photo capture component
+- Created `CameraView` - UIImagePickerController wrapper for camera
+- Created `PhotoLibraryPicker` - PHPickerViewController wrapper
+- Created `PhotoViewerSheet` - Full-screen photo viewing with navigation
+- Updated `TaskItemRow` with photo count badge and camera button
+- Updated `TaskChecklistCard` to pass photo callbacks
+- Added `TaskPhotoSheet` for task-specific photo capture workflow
+- Added `uploadTaskPhoto()` method to WorkOrderService
+
+**Key Features:**
+- Camera capture with automatic compression (max 1MB JPEG)
+- Photo library selection via PHPicker
+- Photo count badge on task items (shows camera icon or photo count)
+- Full-screen photo viewer with swipe navigation and delete
+- Maximum 5 photos per task
+- Multipart form data upload to /api/photos endpoint
+- Photos linked to work order items via completionPhotoId
+
+**UX Compliance:**
+- 56pt touch targets for field staff
+- Large icons and text for outdoor visibility
+- Haptic feedback on photo capture
+- Clear visual feedback for photo count
+
+#### P4-ENH-2: Offline Queue for Field Work ✅
+**Implementation:**
+- Created `OfflineQueueManager.swift` - Persistent queue for failed requests
+- Created `NetworkMonitor.swift` - NWPathMonitor-based connectivity tracking
+- Added `NetworkStatusBanner` component for UI feedback
+- Added `OfflineIndicator` for navigation bar status
+- Integrated offline fallback in WorkOrderService methods
+
+**Key Features:**
+- Queue persisted to UserDefaults (survives app restarts)
+- Automatic retry when network connectivity returns
+- Optimistic local updates for offline actions
+- Maximum 5 retries before giving up on item
+- Support for:
+  - Photo uploads (saved to Documents/OfflinePhotos/)
+  - Clock in/out actions
+  - Task status updates
+  - Work order status changes
+
+**NetworkMonitor Features:**
+- Real-time connectivity monitoring via NWPathMonitor
+- Connection type detection (WiFi, Cellular, Ethernet)
+- Notification posting for non-Combine consumers
+- isGoodForUpload property for smart upload decisions
+
+**UI Integration:**
+- Offline indicator in MyWorkView navigation bar
+- NetworkStatusBanner showing pending item count
+- Syncing progress indicator
+- Automatic queue processing on network restore
+
+**Offline Flow:**
+1. User performs action (clock in, complete task, add photo)
+2. If offline, action queued locally with optimistic UI update
+3. Banner shows "X pending" items
+4. When network returns, queue auto-processes
+5. Success haptic on sync completion
+
+---
+
+### Phase 4 Enhancements Complete! ✅
+All Phase 4 features now implemented:
+- My Work tab with work order list
+- Work order detail with task checklist
+- Time tracking (clock in/out with breaks)
+- Customer signature capture
+- **NEW:** Photo attachment for task completion
+- **NEW:** Offline queue with automatic sync
+
+---
+
+### Files Created/Modified
+
+**New Files:**
+- `Views/FieldStaff/TaskPhotoCapture.swift` - Photo capture components
+- `Services/OfflineQueueManager.swift` - Offline queue management
+- `Services/NetworkMonitor.swift` - Network connectivity monitoring
+
+**Modified Files:**
+- `Views/FieldStaff/WorkOrderDetailView.swift` - Added photo capture UI
+- `Views/FieldStaff/MyWorkView.swift` - Added offline status banner
+- `Services/WorkOrderService.swift` - Added photo upload and offline fallback
+
+---
+
+### Technical Notes
+
+**Photo Upload:**
+- Uses multipart/form-data with boundary-based encoding
+- Compresses images to max 1MB JPEG before upload
+- Links photos to estimate via work order's estimateId
+
+**Offline Queue:**
+- Uses AnyCodable wrapper for flexible additionalData storage
+- Photos saved to OfflinePhotos/ directory with UUID filenames
+- Cleanup removes local files after successful upload
+
+**Network Monitoring:**
+- Uses NWPathMonitor on background queue
+- Updates published on main thread for UI binding
+- Posts notifications for legacy notification-based code
+
+---
+
+### Known Issues
+None currently blocking progress.
+
+---
+*Last updated: 2026-01-16 16:00*

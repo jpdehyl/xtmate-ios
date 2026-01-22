@@ -1,0 +1,181 @@
+{
+  "project": "XtMate iOS - Phase 3",
+  "version": "0.2.0",
+  "sprint": "Room Division & Damage Annotation",
+  "stories": [
+    {
+      "id": "P3-013",
+      "title": "Add room subdivision data model",
+      "description": "Extend Room model to support division lines and sub-rooms when RoomPlan captures connected spaces as one room",
+      "priority": 1,
+      "status": "done",
+      "acceptanceCriteria": [
+        "Room model has optional divisionLines array of line segments",
+        "Room model has optional subRooms array",
+        "SubRoom has own name, category, calculated dimensions",
+        "Room can calculate sub-room dimensions from division lines",
+        "Data persists to UserDefaults via Codable"
+      ],
+      "estimatedMinutes": 30
+    },
+    {
+      "id": "P3-014",
+      "title": "Create RoomDivisionView with floor plan",
+      "description": "Build interactive view showing captured room floor plan where user can draw division lines",
+      "priority": 2,
+      "status": "done",
+      "acceptanceCriteria": [
+        "Show 2D floor plan from room geometry",
+        "Display walls, doors, windows from CapturedRoom data",
+        "Canvas allows drawing straight lines with tap-and-drag",
+        "Lines snap to reasonable angles (0°, 45°, 90°)",
+        "Show room dimensions on floor plan",
+        "Cancel and Done buttons"
+      ],
+      "estimatedMinutes": 45,
+      "dependencies": ["P3-013"]
+    },
+    {
+      "id": "P3-015",
+      "title": "Sub-room naming and categorization",
+      "description": "After drawing division lines, let user name each subdivided area and assign room category",
+      "priority": 3,
+      "status": "done",
+      "acceptanceCriteria": [
+        "After dividing, show list of detected sub-rooms",
+        "Each sub-room shows calculated square footage",
+        "User can tap to name each sub-room",
+        "User can assign category (Kitchen, Bathroom, etc.)",
+        "Auto-suggest room type based on fixtures in that area",
+        "Save creates multiple Room records instead of one"
+      ],
+      "estimatedMinutes": 30,
+      "dependencies": ["P3-014"]
+    },
+    {
+      "id": "P3-016",
+      "title": "Add 'Divide Room' button to RoomCard",
+      "description": "Add UI entry point on captured rooms to launch division editor",
+      "priority": 4,
+      "status": "done",
+      "acceptanceCriteria": [
+        "RoomCard menu includes 'Divide Room' option",
+        "Button presents RoomDivisionView fullscreen",
+        "Only shown for rooms with square footage > 200 SF",
+        "After division, original room is replaced with sub-rooms",
+        "Maintains all original metadata (photos, annotations)"
+      ],
+      "estimatedMinutes": 15,
+      "dependencies": ["P3-015"]
+    },
+    {
+      "id": "P3-017",
+      "title": "Damage annotation data model",
+      "description": "Create Annotation model for marking damaged areas on rooms",
+      "priority": 5,
+      "status": "done",
+      "acceptanceCriteria": [
+        "Annotation struct with id, roomId, position (x,y,z)",
+        "damageType enum (water, fire, smoke, mold, impact, wind, other)",
+        "severity enum (light, moderate, heavy)",
+        "affectedSurfaces array (floor, wall, ceiling)",
+        "affectedHeightIn for water lines",
+        "notes text field",
+        "photoUrls array",
+        "voiceMemoUrl optional string",
+        "createdAt timestamp",
+        "Codable and stored in Room model"
+      ],
+      "estimatedMinutes": 20
+    },
+    {
+      "id": "P3-018",
+      "title": "Damage annotation UI on RoomCard",
+      "description": "Add button to RoomCard to mark damage on the floor plan",
+      "priority": 6,
+      "status": "done",
+      "acceptanceCriteria": [
+        "RoomCard shows 'Add Damage' button",
+        "Button presents DamageAnnotationView",
+        "Shows 2D floor plan with tap-to-place markers",
+        "Each marker shows icon based on damage type",
+        "Tapping marker opens detail sheet",
+        "Can add multiple annotations per room"
+      ],
+      "estimatedMinutes": 30,
+      "dependencies": ["P3-017"]
+    },
+    {
+      "id": "P3-019",
+      "title": "Damage annotation detail form",
+      "description": "Form for specifying damage type, severity, affected areas, and notes",
+      "priority": 7,
+      "status": "done",
+      "acceptanceCriteria": [
+        "Picker for damage type with SF Symbols icons",
+        "Picker for severity (Light/Moderate/Heavy)",
+        "Multi-select for affected surfaces (Floor/Wall/Ceiling)",
+        "TextField for affected height (shows for wall damage)",
+        "TextEditor for notes",
+        "Button to attach photos from camera/library",
+        "Button to record voice memo",
+        "Save and Cancel buttons"
+      ],
+      "estimatedMinutes": 40,
+      "dependencies": ["P3-018"]
+    },
+    {
+      "id": "P3-020",
+      "title": "Display damage annotations on RoomCard",
+      "description": "Show summary of damage annotations in room card UI",
+      "priority": 8,
+      "status": "done",
+      "acceptanceCriteria": [
+        "RoomCard shows damage count badge if annotations exist",
+        "Expandable section lists all annotations",
+        "Each annotation shows icon, type, and severity",
+        "Tapping annotation opens detail view",
+        "Can edit or delete annotations",
+        "Shows preview of first attached photo if present"
+      ],
+      "estimatedMinutes": 25,
+      "dependencies": ["P3-019"]
+    },
+    {
+      "id": "P3-021",
+      "title": "Voice memo recording for annotations",
+      "description": "Add voice recording capability to damage annotations",
+      "priority": 9,
+      "status": "done",
+      "acceptanceCriteria": [
+        "Record button in annotation form",
+        "Shows recording duration timer",
+        "Stop/Cancel recording controls",
+        "Playback control for recorded memo",
+        "Audio saved to local file",
+        "File URL stored in annotation",
+        "Audio synced with room data"
+      ],
+      "estimatedMinutes": 35,
+      "dependencies": ["P3-019"]
+    },
+    {
+      "id": "P3-022",
+      "title": "Photo attachment to annotations",
+      "description": "Allow attaching photos from camera or library to damage markers",
+      "priority": 10,
+      "status": "done",
+      "acceptanceCriteria": [
+        "Add Photo button in annotation form",
+        "Shows action sheet: Take Photo / Choose from Library",
+        "Photos stored locally in app documents",
+        "Display thumbnail grid in annotation detail",
+        "Tap photo to view full screen",
+        "Can delete photos",
+        "Photos sync with room data"
+      ],
+      "estimatedMinutes": 30,
+      "dependencies": ["P3-019"]
+    }
+  ]
+}

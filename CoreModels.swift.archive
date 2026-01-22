@@ -1,0 +1,577 @@
+import Foundation
+import SwiftUI
+import RoomPlan
+
+// MARK: - CGPoint Codable Extension
+
+extension CGPoint: Codable {
+    enum CodingKeys: String, CodingKey {
+        case x
+        case y
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let x = try container.decode(CGFloat.self, forKey: .x)
+        let y = try container.decode(CGFloat.self, forKey: .y)
+        self.init(x: x, y: y)
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(x, forKey: .x)
+        try container.encode(y, forKey: .y)
+    }
+}
+
+// MARK: - Damage Type
+
+/// Types of damage that can be annotated
+enum DamageType: String, Codable, CaseIterable, Identifiable {
+    case water = "Water"
+    case fire = "Fire"
+    case smoke = "Smoke"
+    case mold = "Mold"
+    case impact = "Impact"
+    case wind = "Wind"
+    case other = "Other"
+    
+    var id: String { rawValue }
+    
+    var shortName: String { rawValue }
+    
+    var icon: String {
+        switch self {
+        case .water: return "drop.fill"
+        case .fire: return "flame.fill"
+        case .smoke: return "smoke.fill"
+        case .mold: return "allergens"
+        case .impact: return "burst.fill"
+        case .wind: return "wind"
+        case .other: return "exclamationmark.triangle.fill"
+        }
+    }
+    
+    var color: Color {
+        switch self {
+        case .water: return .blue
+        case .fire: return .red
+        case .smoke: return .gray
+        case .mold: return .green
+        case .impact: return .orange
+        case .wind: return .cyan
+        case .other: return .purple
+        }
+    }
+    
+    var uiColor: UIColor {
+        switch self {
+        case .water: return .systemBlue
+        case .fire: return .systemRed
+        case .smoke: return .systemGray
+        case .mold: return .systemGreen
+        case .impact: return .systemOrange
+        case .wind: return .systemCyan
+        case .other: return .systemPurple
+        }
+    }
+}
+
+// MARK: - Damage Severity
+
+/// Severity levels for damage
+enum DamageSeverity: String, Codable, CaseIterable, Hashable {
+    case light = "Light"
+    case moderate = "Moderate"
+    case heavy = "Heavy"
+    
+    var color: Color {
+        switch self {
+        case .light: return .yellow
+        case .moderate: return .orange
+        case .heavy: return .red
+        }
+    }
+}
+
+// MARK: - Damage Annotation
+
+/// Represents a damage annotation in a room
+struct DamageAnnotation: Identifiable, Codable, Hashable {
+    let id: UUID
+    var roomId: UUID?  // Optional - can be set later when associating with a room
+    var damageType: DamageType
+    var severity: DamageSeverity
+    var affectedSurfaces: Set<AffectedSurface>
+    var position: CGPoint // Normalized 0-1 position on floor plan
+    var affectedHeightIn: Double? // Height in inches for wall damage
+    var notes: String
+    var photos: [String] // Photo file paths (also accessible as photoUrls)
+    var audioPath: String? // Voice note file path (also accessible as voiceMemoUrl)
+    var createdAt: Date
+    var updatedAt: Date
+    
+    // Compatibility aliases
+    var photoUrls: [String] {
+        get { photos }
+        set { photos = newValue }
+    }
+    
+    var voiceMemoUrl: String? {
+        get { audioPath }
+        set { audioPath = newValue }
+    }
+    
+    init(
+        id: UUID = UUID(),
+        roomId: UUID? = nil,
+        position: CGPoint = .zero,
+        damageType: DamageType = .water,
+        severity: DamageSeverity = .moderate,
+        affectedSurfaces: Set<AffectedSurface> = [],
+        affectedHeightIn: Double? = nil,
+        notes: String = "",
+        photos: [String] = [],
+        audioPath: String? = nil,
+        createdAt: Date = Date(),
+        updatedAt: Date = Date()
+    ) {
+        self.id = id
+        self.roomId = roomId
+        self.position = position
+        self.damageType = damageType
+        self.severity = severity
+        self.affectedSurfaces = affectedSurfaces
+        self.affectedHeightIn = affectedHeightIn
+        self.notes = notes
+        self.photos = photos
+        self.audioPath = audioPath
+        self.createdAt = createdAt
+        self.updatedAt = updatedAt
+    }
+}
+
+// MARK: - Affected Surface
+
+/// Surfaces that can be affected by damage
+enum AffectedSurface: String, Codable, CaseIterable, Hashable {
+    case floor = "Floor"
+    case wall = "Wall"
+    case ceiling = "Ceiling"
+    case trim = "Trim"
+    case cabinetry = "Cabinetry"
+    
+    var icon: String {
+        switch self {
+        case .floor: return "square.fill"
+        case .wall: return "rectangle.portrait.fill"
+        case .ceiling: return "rectangle.fill"
+        case .trim: return "line.horizontal.3"
+        case .cabinetry: return "cabinet.fill"
+        }
+    }
+}
+
+// MARK: - Room Model
+
+/// Room captured with LiDAR
+struct Room: Identifiable, Codable, Hashable {
+    let id: UUID
+    var estimateId: UUID
+    var name: String
+    var category: XtMateRoomCategory
+    var floor: String // "1", "2", "Basement", etc.
+    
+    // Dimensions in inches
+    var lengthIn: Double
+    var widthIn: Double
+    var heightIn: Double
+    
+    // Calculated properties
+    var squareFeet: Double { (lengthIn * widthIn) / 144 }
+    var perimeterLf: Double { (lengthIn + widthIn) * 2 / 12 }
+    var wallSf: Double { perimeterLf * (heightIn / 12) }
+    var ceilingSf: Double { squareFeet }
+    
+    // Counts from RoomPlan
+    var wallCount: Int
+    var doorCount: Int
+    var windowCount: Int
+    
+    // Materials
+    var floorMaterial: String?
+    var wallMaterial: String?
+    var ceilingMaterial: String?
+    
+    // Damage annotations
+    var damageAnnotations: [DamageAnnotation]
+    
+    // Photos
+    var photos: [String] // File paths
+    
+    // Metadata
+    var notes: String
+    var createdAt: Date
+    var updatedAt: Date
+    
+    init(
+        id: UUID = UUID(),
+        estimateId: UUID,
+        name: String,
+        category: XtMateRoomCategory = .other,
+        floor: String = "1",
+        lengthIn: Double,
+        widthIn: Double,
+        heightIn: Double,
+        wallCount: Int = 4,
+        doorCount: Int = 1,
+        windowCount: Int = 0,
+        floorMaterial: String? = nil,
+        wallMaterial: String? = nil,
+        ceilingMaterial: String? = nil,
+        damageAnnotations: [DamageAnnotation] = [],
+        photos: [String] = [],
+        notes: String = "",
+        createdAt: Date = Date(),
+        updatedAt: Date = Date()
+    ) {
+        self.id = id
+        self.estimateId = estimateId
+        self.name = name
+        self.category = category
+        self.floor = floor
+        self.lengthIn = lengthIn
+        self.widthIn = widthIn
+        self.heightIn = heightIn
+        self.wallCount = wallCount
+        self.doorCount = doorCount
+        self.windowCount = windowCount
+        self.floorMaterial = floorMaterial
+        self.wallMaterial = wallMaterial
+        self.ceilingMaterial = ceilingMaterial
+        self.damageAnnotations = damageAnnotations
+        self.photos = photos
+        self.notes = notes
+        self.createdAt = createdAt
+        self.updatedAt = updatedAt
+    }
+}
+
+// MARK: - Room Category
+
+/// Categories of rooms
+enum XtMateRoomCategory: String, Codable, CaseIterable {
+    case kitchen = "Kitchen"
+    case bathroom = "Bathroom"
+    case bedroom = "Bedroom"
+    case livingRoom = "Living Room"
+    case diningRoom = "Dining Room"
+    case office = "Office"
+    case laundry = "Laundry"
+    case garage = "Garage"
+    case basement = "Basement"
+    case hallway = "Hallway"
+    case closet = "Closet"
+    case other = "Other"
+    
+    var icon: String {
+        switch self {
+        case .kitchen: return "fork.knife"
+        case .bathroom: return "shower.fill"
+        case .bedroom: return "bed.double.fill"
+        case .livingRoom: return "sofa.fill"
+        case .diningRoom: return "fork.knife.circle"
+        case .office: return "desktopcomputer"
+        case .laundry: return "washer.fill"
+        case .garage: return "car.fill"
+        case .basement: return "stairs"
+        case .hallway: return "arrow.left.arrow.right"
+        case .closet: return "cabinet.fill"
+        case .other: return "square.split.bottomrightquarter"
+        }
+    }
+}
+
+// MARK: - Job Type
+
+/// Type of job/estimate
+enum JobType: String, Codable, CaseIterable {
+    case insurance = "Insurance"
+    case privateJob = "Private Job"
+    case commercial = "Commercial"
+    
+    var icon: String {
+        switch self {
+        case .insurance: return "shield.fill"
+        case .privateJob: return "person.fill"
+        case .commercial: return "building.2.fill"
+        }
+    }
+}
+
+// MARK: - Loss Type
+
+/// Type of loss/damage for insurance claims
+enum LossType: String, Codable, CaseIterable {
+    case water = "Water"
+    case fire = "Fire"
+    case storm = "Storm"
+    case mold = "Mold"
+    case vandalism = "Vandalism"
+    case other = "Other"
+    
+    var icon: String {
+        switch self {
+        case .water: return "drop.fill"
+        case .fire: return "flame.fill"
+        case .storm: return "cloud.bolt.rain.fill"
+        case .mold: return "allergens"
+        case .vandalism: return "exclamationmark.triangle.fill"
+        case .other: return "questionmark.circle.fill"
+        }
+    }
+}
+
+// MARK: - Claim Status
+
+/// Status of the claim/estimate
+enum ClaimStatus: String, Codable, CaseIterable {
+    case draft = "Draft"
+    case active = "Active"
+    case submitted = "Submitted"
+    case approved = "Approved"
+    case completed = "Completed"
+    case cancelled = "Cancelled"
+    
+    var icon: String {
+        switch self {
+        case .draft: return "doc.text"
+        case .active: return "play.circle.fill"
+        case .submitted: return "paperplane.fill"
+        case .approved: return "checkmark.circle.fill"
+        case .completed: return "checkmark.seal.fill"
+        case .cancelled: return "xmark.circle.fill"
+        }
+    }
+    
+    var color: Color {
+        switch self {
+        case .draft: return .gray
+        case .active: return .blue
+        case .submitted: return .orange
+        case .approved: return .green
+        case .completed: return .green
+        case .cancelled: return .red
+        }
+    }
+}
+
+// MARK: - Sync Status
+
+/// Synchronization status with Xactimate
+enum SyncStatus: String, Codable, CaseIterable {
+    case pending = "Pending"
+    case syncing = "Syncing"
+    case synced = "Synced"
+    case failed = "Failed"
+    case conflict = "Conflict"
+    
+    var icon: String {
+        switch self {
+        case .pending: return "clock.fill"
+        case .syncing: return "arrow.triangle.2.circlepath"
+        case .synced: return "checkmark.icloud.fill"
+        case .failed: return "exclamationmark.icloud.fill"
+        case .conflict: return "exclamationmark.triangle.fill"
+        }
+    }
+    
+    var color: Color {
+        switch self {
+        case .pending: return .orange
+        case .syncing: return .blue
+        case .synced: return .green
+        case .failed: return .red
+        case .conflict: return .yellow
+        }
+    }
+}
+
+// MARK: - Estimate/Claim Model
+
+/// Main estimate/claim model
+struct Estimate: Identifiable, Codable {
+    let id: UUID
+    var name: String
+    var jobType: JobType
+    
+    // Claim details
+    var claimNumber: String?
+    var xaId: String?
+    var dateOfLoss: Date?
+    var lossType: LossType
+    
+    // Insured
+    var insuredName: String?
+    var insuredEmail: String?
+    var insuredPhone: String?
+    
+    // Property
+    var propertyAddress: String?
+    var propertyCity: String?
+    var propertyState: String?
+    var propertyZip: String?
+    
+    // Adjuster
+    var adjusterName: String?
+    var adjusterPhone: String?
+    var adjusterEmail: String?
+    var insuranceCompany: String?
+    
+    // Status
+    var status: ClaimStatus
+    var syncStatus: SyncStatus
+    
+    // Rooms & Assignments
+    var rooms: [Room]
+    var assignments: [Assignment]
+    
+    // Metadata
+    var notes: String
+    var rawDispatchEmail: String?
+    var createdAt: Date
+    var updatedAt: Date
+    var syncedAt: Date?
+    
+    init(
+        id: UUID = UUID(),
+        name: String,
+        jobType: JobType = .insurance,
+        claimNumber: String? = nil,
+        xaId: String? = nil,
+        dateOfLoss: Date? = nil,
+        lossType: LossType = .water,
+        insuredName: String? = nil,
+        insuredEmail: String? = nil,
+        insuredPhone: String? = nil,
+        propertyAddress: String? = nil,
+        propertyCity: String? = nil,
+        propertyState: String? = nil,
+        propertyZip: String? = nil,
+        adjusterName: String? = nil,
+        adjusterPhone: String? = nil,
+        adjusterEmail: String? = nil,
+        insuranceCompany: String? = nil,
+        status: ClaimStatus = .draft,
+        syncStatus: SyncStatus = .pending,
+        rooms: [Room] = [],
+        assignments: [Assignment] = [],
+        notes: String = "",
+        rawDispatchEmail: String? = nil,
+        createdAt: Date = Date(),
+        updatedAt: Date = Date(),
+        syncedAt: Date? = nil
+    ) {
+        self.id = id
+        self.name = name
+        self.jobType = jobType
+        self.claimNumber = claimNumber
+        self.xaId = xaId
+        self.dateOfLoss = dateOfLoss
+        self.lossType = lossType
+        self.insuredName = insuredName
+        self.insuredEmail = insuredEmail
+        self.insuredPhone = insuredPhone
+        self.propertyAddress = propertyAddress
+        self.propertyCity = propertyCity
+        self.propertyState = propertyState
+        self.propertyZip = propertyZip
+        self.adjusterName = adjusterName
+        self.adjusterPhone = adjusterPhone
+        self.adjusterEmail = adjusterEmail
+        self.insuranceCompany = insuranceCompany
+        self.status = status
+        self.syncStatus = syncStatus
+        self.rooms = rooms
+        self.assignments = assignments
+        self.notes = notes
+        self.rawDispatchEmail = rawDispatchEmail
+        self.createdAt = createdAt
+        self.updatedAt = updatedAt
+        self.syncedAt = syncedAt
+    }
+    
+    var displayName: String {
+        if let address = propertyAddress {
+            return address
+        } else if let name = insuredName {
+            return name
+        } else if let claim = claimNumber {
+            return "Claim #\(claim)"
+        } else {
+            return name
+        }
+    }
+    
+    var totalSquareFeet: Double {
+        rooms.reduce(0) { $0 + $1.squareFeet }
+    }
+    
+    var totalDamageCount: Int {
+        rooms.reduce(0) { $0 + $1.damageAnnotations.count }
+    }
+}
+// MARK: - Room Extensions
+
+extension Room {
+    /// Convert Room to RoomListItem for use in cards and lists
+    func toRoomListItem() -> RoomListItem {
+        RoomListItem(
+            id: id,
+            name: name,
+            category: category.rawValue,
+            floor: floor,
+            hasScope: !damageAnnotations.isEmpty,
+            damageCount: damageAnnotations.count
+        )
+    }
+    
+    /// Detect room category from a CapturedRoom
+    static func detectCategory(from capturedRoom: CapturedRoom) -> XtMateRoomCategory {
+        // Try to detect based on objects in the room
+        let objectCategories = capturedRoom.objects.map { $0.category }
+        
+        if objectCategories.contains(.refrigerator) || objectCategories.contains(.stove) || objectCategories.contains(.oven) {
+            return .kitchen
+        }
+        
+        if objectCategories.contains(.toilet) || objectCategories.contains(.bathtub) || objectCategories.contains(.sink) {
+            return .bathroom
+        }
+        
+        if objectCategories.contains(.bed) {
+            return .bedroom
+        }
+        
+        if objectCategories.contains(.washerDryer) {
+            return .laundry
+        }
+        
+        if objectCategories.contains(.sofa) || objectCategories.contains(.television) {
+            return .livingRoom
+        }
+        
+        if objectCategories.contains(.table) || objectCategories.contains(.dishwasher) {
+            return .diningRoom
+        }
+        
+        // Default to other if we can't detect
+        return .other
+    }
+}
+
+// MARK: - Type Aliases
+
+/// Type alias for convenience - avoid RoomPlan.RoomCategory conflicts
+typealias RoomCategory = XtMateRoomCategory
+
