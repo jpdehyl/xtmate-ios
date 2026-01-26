@@ -26,6 +26,13 @@ struct ContentView: View {
     @State private var showingSyncAlert = false
     @State private var syncAlertMessage = ""
 
+    // ESX Export states
+    @State private var showingESXShareSheet = false
+    @State private var esxFileURL: URL?
+    @State private var isExportingESX = false
+    @State private var esxExportError: String?
+    @State private var showingESXError = false
+
     // P3-RC-002: Room boundary detection states
     @State private var analysisResult: RoomBoundaryAnalysisResult?
     @State private var showingProposedRooms = false
@@ -64,6 +71,14 @@ struct ContentView: View {
                         }
                         ToolbarItem(placement: .navigationBarTrailing) {
                             Menu {
+                                // ESX Export
+                                Button(action: { exportToESX(estimate) }) {
+                                    Label("Export to Xactimate (ESX)", systemImage: "square.and.arrow.up")
+                                }
+                                .disabled(estimate.rooms.isEmpty || isExportingESX)
+
+                                Divider()
+
                                 Button(role: .destructive, action: {
                                     store.showingDeleteConfirmation = true
                                 }) {
@@ -201,7 +216,78 @@ struct ContentView: View {
         } message: {
             Text(syncAlertMessage)
         }
+        // ESX Export share sheet
+        .sheet(isPresented: $showingESXShareSheet) {
+            if let url = esxFileURL {
+                ESXShareSheet(url: url)
+            }
+        }
+        .alert("Export Error", isPresented: $showingESXError) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(esxExportError ?? "Unknown error occurred during export.")
+        }
+        // ESX Export overlay
+        .overlay {
+            if isExportingESX {
+                ZStack {
+                    Color.black.opacity(0.4)
+                        .ignoresSafeArea()
+
+                    VStack(spacing: 16) {
+                        ProgressView()
+                            .scaleEffect(1.5)
+                            .tint(.white)
+
+                        Text("Exporting to ESX...")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                    }
+                    .padding(32)
+                    .background(Color(.systemGray5).opacity(0.9))
+                    .cornerRadius(16)
+                }
+            }
+        }
     }
+
+    // MARK: - ESX Export
+
+    private func exportToESX(_ estimate: Estimate) {
+        guard !estimate.rooms.isEmpty else { return }
+
+        isExportingESX = true
+
+        DispatchQueue.global(qos: .userInitiated).async {
+            do {
+                let url = try ESXExportService.shared.exportToESX(estimate: estimate)
+
+                DispatchQueue.main.async {
+                    isExportingESX = false
+                    esxFileURL = url
+                    showingESXShareSheet = true
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    isExportingESX = false
+                    esxExportError = error.localizedDescription
+                    showingESXError = true
+                }
+            }
+        }
+    }
+}
+
+// MARK: - ESX Share Sheet
+
+struct ESXShareSheet: UIViewControllerRepresentable {
+    let url: URL
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: [url], applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 
 // MARK: - Sync Button
@@ -2393,50 +2479,112 @@ struct ActionButtonsCard: View {
     @ObservedObject var store: EstimateStore
     @State private var isSyncing = false
     @State private var showingSyncSuccess = false
-    
+    @State private var isExportingESX = false
+    @State private var showingESXShareSheet = false
+    @State private var esxFileURL: URL?
+    @State private var showingESXError = false
+    @State private var esxExportError: String?
+
     var body: some View {
-        HStack(spacing: 16) {
-            // Sync Button
-            Button(action: syncToWeb) {
+        VStack(spacing: 12) {
+            HStack(spacing: 16) {
+                // Sync Button
+                Button(action: syncToWeb) {
+                    HStack(spacing: 12) {
+                        if isSyncing {
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                        } else {
+                            Image(systemName: "arrow.triangle.2.circlepath")
+                                .font(.title3)
+                        }
+                        Text(isSyncing ? "Syncing..." : "Sync to Web")
+                            .font(.headline)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 18)
+                    .background(Color.green)
+                    .foregroundColor(.white)
+                    .cornerRadius(12)
+                }
+                .disabled(isSyncing || estimate.rooms.isEmpty)
+
+                // Generate Scope Button (Future)
+                Button(action: {}) {
+                    HStack(spacing: 12) {
+                        Image(systemName: "wand.and.stars")
+                            .font(.title3)
+                        Text("Generate AI Scope")
+                            .font(.headline)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 18)
+                    .background(Color.purple)
+                    .foregroundColor(.white)
+                    .cornerRadius(12)
+                }
+                .disabled(estimate.rooms.isEmpty)
+            }
+
+            // ESX Export Button
+            Button(action: exportToESX) {
                 HStack(spacing: 12) {
-                    if isSyncing {
+                    if isExportingESX {
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle(tint: .white))
                     } else {
-                        Image(systemName: "arrow.triangle.2.circlepath")
+                        Image(systemName: "square.and.arrow.up")
                             .font(.title3)
                     }
-                    Text(isSyncing ? "Syncing..." : "Sync to Web")
+                    Text(isExportingESX ? "Exporting..." : "Export to Xactimate (ESX)")
                         .font(.headline)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 18)
-                .background(Color.green)
+                .background(Color.orange)
                 .foregroundColor(.white)
                 .cornerRadius(12)
             }
-            .disabled(isSyncing || estimate.rooms.isEmpty)
-            
-            // Generate Scope Button (Future)
-            Button(action: {}) {
-                HStack(spacing: 12) {
-                    Image(systemName: "wand.and.stars")
-                        .font(.title3)
-                    Text("Generate AI Scope")
-                        .font(.headline)
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 18)
-                .background(Color.purple)
-                .foregroundColor(.white)
-                .cornerRadius(12)
-            }
-            .disabled(estimate.rooms.isEmpty)
+            .disabled(isExportingESX || estimate.rooms.isEmpty)
         }
         .alert("Sync Complete", isPresented: $showingSyncSuccess) {
             Button("OK") {}
         } message: {
             Text("Estimate synced to web successfully!")
+        }
+        .alert("Export Error", isPresented: $showingESXError) {
+            Button("OK") {}
+        } message: {
+            Text(esxExportError ?? "Unknown error during export.")
+        }
+        .sheet(isPresented: $showingESXShareSheet) {
+            if let url = esxFileURL {
+                ESXShareSheet(url: url)
+            }
+        }
+    }
+
+    private func exportToESX() {
+        guard !estimate.rooms.isEmpty else { return }
+
+        isExportingESX = true
+
+        DispatchQueue.global(qos: .userInitiated).async {
+            do {
+                let url = try ESXExportService.shared.exportToESX(estimate: estimate)
+
+                DispatchQueue.main.async {
+                    isExportingESX = false
+                    esxFileURL = url
+                    showingESXShareSheet = true
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    isExportingESX = false
+                    esxExportError = error.localizedDescription
+                    showingESXError = true
+                }
+            }
         }
     }
     
