@@ -33,6 +33,12 @@ struct ContentView: View {
     @State private var esxExportError: String?
     @State private var showingESXError = false
 
+    // ESX Import states
+    @State private var showingESXImporter = false
+    @State private var isImportingESX = false
+    @State private var showingESXImportResult = false
+    @State private var esxImportResult: ESXImportResult?
+
     // P3-RC-002: Room boundary detection states
     @State private var analysisResult: RoomBoundaryAnalysisResult?
     @State private var showingProposedRooms = false
@@ -71,6 +77,12 @@ struct ContentView: View {
                         }
                         ToolbarItem(placement: .navigationBarTrailing) {
                             Menu {
+                                // ESX Import
+                                Button(action: { showingESXImporter = true }) {
+                                    Label("Import from ESX", systemImage: "square.and.arrow.down")
+                                }
+                                .disabled(isImportingESX)
+
                                 // ESX Export
                                 Button(action: { exportToESX(estimate) }) {
                                     Label("Export to Xactimate (ESX)", systemImage: "square.and.arrow.up")
@@ -249,6 +261,71 @@ struct ContentView: View {
                 }
             }
         }
+        // ESX Import file picker
+        .fileImporter(
+            isPresented: $showingESXImporter,
+            allowedContentTypes: [.init(filenameExtension: "esx")!, .init(filenameExtension: "ESX")!, .data],
+            allowsMultipleSelection: false
+        ) { result in
+            switch result {
+            case .success(let urls):
+                if let url = urls.first {
+                    // Start accessing security-scoped resource
+                    guard url.startAccessingSecurityScopedResource() else {
+                        esxImportResult = ESXImportResult(
+                            success: false,
+                            content: nil,
+                            importedRooms: [],
+                            error: "Unable to access file"
+                        )
+                        showingESXImportResult = true
+                        return
+                    }
+                    defer { url.stopAccessingSecurityScopedResource() }
+
+                    importESX(from: url)
+                }
+            case .failure(let error):
+                esxImportResult = ESXImportResult(
+                    success: false,
+                    content: nil,
+                    importedRooms: [],
+                    error: error.localizedDescription
+                )
+                showingESXImportResult = true
+            }
+        }
+        // ESX Import result alert
+        .alert(
+            esxImportResult?.success == true ? "Import Complete" : "Import Result",
+            isPresented: $showingESXImportResult
+        ) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(esxImportResult?.summary ?? "No result")
+        }
+        // ESX Import overlay
+        .overlay {
+            if isImportingESX {
+                ZStack {
+                    Color.black.opacity(0.4)
+                        .ignoresSafeArea()
+
+                    VStack(spacing: 16) {
+                        ProgressView()
+                            .scaleEffect(1.5)
+                            .tint(.white)
+
+                        Text("Importing ESX...")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                    }
+                    .padding(32)
+                    .background(Color(.systemGray5).opacity(0.9))
+                    .cornerRadius(16)
+                }
+            }
+        }
     }
 
     // MARK: - ESX Export
@@ -274,6 +351,86 @@ struct ContentView: View {
                     showingESXError = true
                 }
             }
+        }
+    }
+
+    // MARK: - ESX Import
+
+    private func importESX(from url: URL) {
+        isImportingESX = true
+
+        DispatchQueue.global(qos: .userInitiated).async {
+            do {
+                // Read and analyze ESX file
+                let content = try ESXReaderService.shared.readESX(from: url)
+
+                // Import rooms if sketch data is available
+                var importedRooms: [Room] = []
+                if content.hasSketch {
+                    importedRooms = try ESXReaderService.shared.importRooms(from: url)
+                }
+
+                let result = ESXImportResult(
+                    success: true,
+                    content: content,
+                    importedRooms: importedRooms,
+                    error: nil
+                )
+
+                DispatchQueue.main.async {
+                    isImportingESX = false
+                    esxImportResult = result
+
+                    // Add imported rooms to current estimate
+                    if let estimate = store.currentEstimate {
+                        for room in importedRooms {
+                            store.addRoomDirect(room)
+                        }
+                    }
+
+                    showingESXImportResult = true
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    isImportingESX = false
+                    esxImportResult = ESXImportResult(
+                        success: false,
+                        content: nil,
+                        importedRooms: [],
+                        error: error.localizedDescription
+                    )
+                    showingESXImportResult = true
+                }
+            }
+        }
+    }
+}
+
+// MARK: - ESX Import Result
+
+struct ESXImportResult {
+    let success: Bool
+    let content: ESXContent?
+    let importedRooms: [Room]
+    let error: String?
+
+    var summary: String {
+        if success {
+            var parts: [String] = []
+            if !importedRooms.isEmpty {
+                parts.append("Imported \(importedRooms.count) room(s)")
+            }
+            if let content = content {
+                if content.hasXACTDOC {
+                    parts.append("XACTDOC detected (encrypted)")
+                }
+                if content.hasPhotos {
+                    parts.append("\(content.photos.count) photo(s) (encrypted)")
+                }
+            }
+            return parts.isEmpty ? "ESX file analyzed" : parts.joined(separator: "\n")
+        } else {
+            return error ?? "Import failed"
         }
     }
 }

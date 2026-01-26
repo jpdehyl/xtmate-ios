@@ -151,11 +151,13 @@ class ESXExportService {
 
     /// Generate FIF XML from estimate data
     private func generateFIFXML(estimate: Estimate, floorPlanData: FloorPlanData?) -> String {
+        let documentId = generateId()
+
         var xml = """
         <?xml version="1.0" encoding="UTF-8"?>
         <FIF>
           <SKETCH_FILES>
-            <SKETCHDOCUMENT id="SKT\(generateId())" minorVersion="27">
+            <SKETCHDOCUMENT id="SKT\(documentId)" minorVersion="27">
 
         """
 
@@ -166,22 +168,28 @@ class ESXExportService {
             let floorElevation = elevationForFloor(floor)
             let levelId = generateId()
 
-            xml += """
-                  <SKETCHLEVEL floorElevation="\(floorElevation)" id="SKT\(levelId)" name="\(floor.displayName)">
-
-            """
+            // Track all coordinates for this level
+            var levelCoordinates: [Double] = []
+            var vertexCoordIndices: [Int: Int] = [:]  // vertex ID -> coordinate index
 
             // Generate geometry for each room on this floor
-            var allVertices: [(id: Int, point: CGPoint, wallIds: [Int])] = []
-            var allWalls: [(id: Int, vertexIds: [Int], roomIds: [Int], thickness: Int)] = []
+            var allVertices: [(id: Int, point: CGPoint, wallIds: [Int], coordIndex: Int)] = []
+            var allWalls: [(id: Int, vertexIds: [Int], roomIds: [Int], thickness: Int, openings: [WallOpening])] = []
             var allRooms: [(id: Int, name: String, wallIds: [Int], ceilingHeight: Int)] = []
-            var coordinates: [Double] = []
 
+            var roomOffset = CGPoint.zero
             for room in rooms {
-                let geometry = generateRoomGeometry(
+                let geometry = generateRoomGeometryWithCoords(
                     room: room,
-                    startCoordIndex: coordinates.count / 3
+                    offset: roomOffset,
+                    startCoordIndex: levelCoordinates.count / 3,
+                    floorElevation: floorElevation
                 )
+
+                // Map vertex IDs to coordinate indices
+                for vertex in geometry.vertices {
+                    vertexCoordIndices[vertex.id] = vertex.coordIndex
+                }
 
                 allVertices.append(contentsOf: geometry.vertices)
                 allWalls.append(contentsOf: geometry.walls)
@@ -191,14 +199,22 @@ class ESXExportService {
                     wallIds: geometry.walls.map { $0.id },
                     ceilingHeight: Int(room.heightIn / 12.0 * ceilingHeightScale)
                 ))
-                coordinates.append(contentsOf: geometry.coordinates)
+                levelCoordinates.append(contentsOf: geometry.coordinates)
+
+                // Offset next room to avoid overlap
+                roomOffset.x += room.lengthIn / 12.0 + 2.0
             }
 
-            // Write vertices
+            xml += """
+                  <SKETCHLEVEL floorElevation="\(floorElevation)" id="SKT\(levelId)" name="\(floor.displayName)">
+
+            """
+
+            // Write vertices with correct coordinate indices
             for vertex in allVertices {
                 let wallIdsStr = vertex.wallIds.map { String($0) }.joined(separator: " ")
                 xml += """
-                        <SKETCHLEVELVERTEX id="SKT\(vertex.id)" vertex="\(coordinates.count / 3)" wallIDs="\(wallIdsStr)" />
+                        <SKETCHLEVELVERTEX id="SKT\(vertex.id)" vertex="\(vertex.coordIndex)" wallIDs="\(wallIdsStr)" />
 
                 """
             }
@@ -216,17 +232,39 @@ class ESXExportService {
                 """
             }
 
-            // Write walls
+            // Write walls with openings
             for wall in allWalls {
                 let vertexIdsStr = wall.vertexIds.map { String($0) }.joined(separator: " ")
                 let roomIdsStr = wall.roomIds.map { String($0) }.joined(separator: " ")
-                xml += """
-                        <SKETCHWALL id="SKT\(wall.id)" roomIDs="\(roomIdsStr)" thickness="\(wall.thickness)" vertexIDs="\(vertexIdsStr)" jsonId="\(UUID().uuidString)" />
 
-                """
+                if wall.openings.isEmpty {
+                    xml += """
+                            <SKETCHWALL id="SKT\(wall.id)" roomIDs="\(roomIdsStr)" thickness="\(wall.thickness)" vertexIDs="\(vertexIdsStr)" jsonId="\(UUID().uuidString)" />
+
+                    """
+                } else {
+                    xml += """
+                            <SKETCHWALL id="SKT\(wall.id)" roomIDs="\(roomIdsStr)" thickness="\(wall.thickness)" vertexIDs="\(vertexIdsStr)" jsonId="\(UUID().uuidString)">
+
+                    """
+                    for opening in wall.openings {
+                        let coordIndexStr = opening.coordIndices.map { String($0) }.joined(separator: " ")
+                        xml += """
+                              <SKETCHWALLOPENING id="SKT\(opening.id)" coordIndex="\(coordIndexStr)" type="\(opening.type)" doorType="\(opening.doorType)" flags="\(opening.flags)" />
+
+                        """
+                    }
+                    xml += """
+                            </SKETCHWALL>
+
+                    """
+                }
             }
 
+            // Write COORDINATE3 array
+            let coordString = levelCoordinates.map { String(Int($0)) }.joined(separator: " ")
             xml += """
+                    <COORDINATE3>\(coordString)</COORDINATE3>
                   </SKETCHLEVEL>
 
             """
@@ -313,8 +351,11 @@ class ESXExportService {
                         let opening = WallOpening(
                             id: generateId(),
                             type: 2,  // Door
+                            doorType: 0,  // Standard door
                             width: doorway.width * feetToMicrons,
-                            position: doorway.position
+                            height: 6.67 * feetToMicrons,  // Standard 6'8" door height
+                            position: doorway.position,
+                            flags: 16
                         )
                         openings.append(opening)
                     }
@@ -326,8 +367,11 @@ class ESXExportService {
                         let opening = WallOpening(
                             id: generateId(),
                             type: 1,  // Window
+                            doorType: 0,
                             width: window.width * feetToMicrons,
-                            position: window.position
+                            height: 4.0 * feetToMicrons,  // Standard 4' window height
+                            position: window.position,
+                            flags: 16
                         )
                         openings.append(opening)
                     }
@@ -429,64 +473,171 @@ class ESXExportService {
 
     private struct RoomGeometry {
         let roomId: Int
-        let vertices: [(id: Int, point: CGPoint, wallIds: [Int])]
-        let walls: [(id: Int, vertexIds: [Int], roomIds: [Int], thickness: Int)]
+        let vertices: [(id: Int, point: CGPoint, wallIds: [Int], coordIndex: Int)]
+        let walls: [(id: Int, vertexIds: [Int], roomIds: [Int], thickness: Int, openings: [WallOpening])]
         let coordinates: [Double]
     }
 
     private struct WallOpening {
         let id: Int
         let type: Int  // 0=opening, 1=window, 2=door
+        let doorType: Int  // 0=standard, 1=pocket, 2=bifold, 3=sliding, 4=french
         let width: Double
+        let height: Double
         let position: CGPoint
+        var coordIndices: [Int] = []  // 4 coordinate indices for opening polygon
+        let flags: Int  // 16 = standard flags
     }
 
-    /// Generate geometry for a rectangular room
-    private func generateRoomGeometry(room: Room, startCoordIndex: Int) -> RoomGeometry {
+    /// Generate geometry for a rectangular room with proper coordinate tracking
+    private func generateRoomGeometryWithCoords(
+        room: Room,
+        offset: CGPoint,
+        startCoordIndex: Int,
+        floorElevation: Double
+    ) -> RoomGeometry {
         let roomId = generateId()
 
-        // Convert dimensions from inches to feet, then to microns
+        // Convert dimensions from inches to feet
         let lengthFt = room.lengthIn / 12.0
         let widthFt = room.widthIn / 12.0
+        let heightFt = room.heightIn / 12.0
 
-        let lengthMicrons = lengthFt * feetToMicrons
-        let widthMicrons = widthFt * feetToMicrons
-
-        // Generate 4 corners (clockwise from origin)
+        // Generate 4 corners (clockwise from origin) with offset
         let corners: [CGPoint] = [
-            CGPoint(x: 0, y: 0),
-            CGPoint(x: lengthFt, y: 0),
-            CGPoint(x: lengthFt, y: widthFt),
-            CGPoint(x: 0, y: widthFt)
+            CGPoint(x: offset.x, y: offset.y),
+            CGPoint(x: offset.x + lengthFt, y: offset.y),
+            CGPoint(x: offset.x + lengthFt, y: offset.y + widthFt),
+            CGPoint(x: offset.x, y: offset.y + widthFt)
         ]
 
-        // Create vertices
-        var vertices: [(id: Int, point: CGPoint, wallIds: [Int])] = []
+        // Create vertices with coordinate indices
+        var vertices: [(id: Int, point: CGPoint, wallIds: [Int], coordIndex: Int)] = []
         var coordinates: [Double] = []
+        var coordIndex = startCoordIndex
 
         for corner in corners {
             let vertexId = generateId()
-            vertices.append((id: vertexId, point: corner, wallIds: []))
+            vertices.append((id: vertexId, point: corner, wallIds: [], coordIndex: coordIndex))
 
-            // Convert to microns for coordinate array
+            // Convert to microns for coordinate array (X, Y=elevation, Z)
             coordinates.append(corner.x * feetToMicrons)
-            coordinates.append(0)  // Y is floor level
+            coordinates.append(floorElevation)  // Y is floor elevation
             coordinates.append(corner.y * feetToMicrons)  // 2D Y -> 3D Z
+
+            coordIndex += 1
         }
 
         // Create 4 walls connecting vertices
-        var walls: [(id: Int, vertexIds: [Int], roomIds: [Int], thickness: Int)] = []
+        var walls: [(id: Int, vertexIds: [Int], roomIds: [Int], thickness: Int, openings: [WallOpening])] = []
+
+        // Generate openings based on door/window counts
+        let doorsPerWall = room.doorCount > 0 ? max(1, room.doorCount / 4) : 0
+        let windowsPerWall = room.windowCount > 0 ? max(1, room.windowCount / 4) : 0
 
         for i in 0..<4 {
             let wallId = generateId()
             let startVertex = vertices[i].id
             let endVertex = vertices[(i + 1) % 4].id
 
+            var wallOpenings: [WallOpening] = []
+
+            // Add door to first wall if room has doors
+            if i == 0 && room.doorCount > 0 {
+                // Calculate opening position (center of wall)
+                let wallStart = corners[i]
+                let wallEnd = corners[(i + 1) % 4]
+                let doorWidth = 3.0  // 3 feet standard door
+                let doorHeight = 6.67  // 6'8" standard door
+
+                // Add coordinates for door opening (4 corners of opening)
+                let doorStartCoord = coordIndex
+                let doorCenterX = (wallStart.x + wallEnd.x) / 2
+                let doorCenterZ = (wallStart.y + wallEnd.y) / 2
+
+                // Door opening corners (bottom-left, bottom-right, top-right, top-left)
+                let doorHalfWidth = doorWidth / 2
+                if wallStart.y == wallEnd.y {
+                    // Horizontal wall
+                    coordinates.append(contentsOf: [
+                        (doorCenterX - doorHalfWidth) * feetToMicrons, floorElevation, doorCenterZ * feetToMicrons,
+                        (doorCenterX + doorHalfWidth) * feetToMicrons, floorElevation, doorCenterZ * feetToMicrons,
+                        (doorCenterX + doorHalfWidth) * feetToMicrons, floorElevation + doorHeight * feetToMicrons, doorCenterZ * feetToMicrons,
+                        (doorCenterX - doorHalfWidth) * feetToMicrons, floorElevation + doorHeight * feetToMicrons, doorCenterZ * feetToMicrons
+                    ])
+                } else {
+                    // Vertical wall
+                    coordinates.append(contentsOf: [
+                        doorCenterX * feetToMicrons, floorElevation, (doorCenterZ - doorHalfWidth) * feetToMicrons,
+                        doorCenterX * feetToMicrons, floorElevation, (doorCenterZ + doorHalfWidth) * feetToMicrons,
+                        doorCenterX * feetToMicrons, floorElevation + doorHeight * feetToMicrons, (doorCenterZ + doorHalfWidth) * feetToMicrons,
+                        doorCenterX * feetToMicrons, floorElevation + doorHeight * feetToMicrons, (doorCenterZ - doorHalfWidth) * feetToMicrons
+                    ])
+                }
+
+                var opening = WallOpening(
+                    id: generateId(),
+                    type: 2,  // Door
+                    doorType: 0,
+                    width: doorWidth * feetToMicrons,
+                    height: doorHeight * feetToMicrons,
+                    position: CGPoint(x: doorCenterX, y: doorCenterZ),
+                    flags: 16
+                )
+                opening.coordIndices = [doorStartCoord, doorStartCoord + 1, doorStartCoord + 2, doorStartCoord + 3]
+                coordIndex += 4
+                wallOpenings.append(opening)
+            }
+
+            // Add window to second and third walls if room has windows
+            if (i == 1 || i == 2) && room.windowCount > 0 && i <= room.windowCount {
+                let wallStart = corners[i]
+                let wallEnd = corners[(i + 1) % 4]
+                let windowWidth = 3.0  // 3 feet standard window
+                let windowHeight = 4.0  // 4 feet standard window
+                let windowSillHeight = 3.0  // 3 feet from floor
+
+                let windowStartCoord = coordIndex
+                let windowCenterX = (wallStart.x + wallEnd.x) / 2
+                let windowCenterZ = (wallStart.y + wallEnd.y) / 2
+                let windowHalfWidth = windowWidth / 2
+
+                if wallStart.y == wallEnd.y {
+                    coordinates.append(contentsOf: [
+                        (windowCenterX - windowHalfWidth) * feetToMicrons, floorElevation + windowSillHeight * feetToMicrons, windowCenterZ * feetToMicrons,
+                        (windowCenterX + windowHalfWidth) * feetToMicrons, floorElevation + windowSillHeight * feetToMicrons, windowCenterZ * feetToMicrons,
+                        (windowCenterX + windowHalfWidth) * feetToMicrons, floorElevation + (windowSillHeight + windowHeight) * feetToMicrons, windowCenterZ * feetToMicrons,
+                        (windowCenterX - windowHalfWidth) * feetToMicrons, floorElevation + (windowSillHeight + windowHeight) * feetToMicrons, windowCenterZ * feetToMicrons
+                    ])
+                } else {
+                    coordinates.append(contentsOf: [
+                        windowCenterX * feetToMicrons, floorElevation + windowSillHeight * feetToMicrons, (windowCenterZ - windowHalfWidth) * feetToMicrons,
+                        windowCenterX * feetToMicrons, floorElevation + windowSillHeight * feetToMicrons, (windowCenterZ + windowHalfWidth) * feetToMicrons,
+                        windowCenterX * feetToMicrons, floorElevation + (windowSillHeight + windowHeight) * feetToMicrons, (windowCenterZ + windowHalfWidth) * feetToMicrons,
+                        windowCenterX * feetToMicrons, floorElevation + (windowSillHeight + windowHeight) * feetToMicrons, (windowCenterZ - windowHalfWidth) * feetToMicrons
+                    ])
+                }
+
+                var opening = WallOpening(
+                    id: generateId(),
+                    type: 1,  // Window
+                    doorType: 0,
+                    width: windowWidth * feetToMicrons,
+                    height: windowHeight * feetToMicrons,
+                    position: CGPoint(x: windowCenterX, y: windowCenterZ),
+                    flags: 16
+                )
+                opening.coordIndices = [windowStartCoord, windowStartCoord + 1, windowStartCoord + 2, windowStartCoord + 3]
+                coordIndex += 4
+                wallOpenings.append(opening)
+            }
+
             walls.append((
                 id: wallId,
                 vertexIds: [startVertex, endVertex],
                 roomIds: [roomId],
-                thickness: wallThicknessMicrons
+                thickness: wallThicknessMicrons,
+                openings: wallOpenings
             ))
 
             // Update vertex wall references
