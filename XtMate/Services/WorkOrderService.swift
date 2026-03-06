@@ -28,7 +28,7 @@ class WorkOrderService: ObservableObject {
         #if DEBUG
         self.baseURL = "http://localhost:3000"
         #else
-        self.baseURL = "https://xtmate.vercel.app"
+        self.baseURL = "https://xtmate-v3.vercel.app"
         #endif
     }
 

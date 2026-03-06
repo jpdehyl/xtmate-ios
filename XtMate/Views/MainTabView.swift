@@ -96,6 +96,21 @@ struct SettingsView: View {
                     }
                 }
 
+
+
+                Section("Web Sync") {
+                    NavigationLink {
+                        WebConnectionView()
+                    } label: {
+                        Label("Server URL + API Token", systemImage: "link")
+                    }
+
+                    if !authService.isSignedIn {
+                        Label("⚙️ Connect to Web to enable sync", systemImage: "exclamationmark.triangle.fill")
+                            .foregroundColor(.orange)
+                    }
+                }
+
                 // App Info section
                 Section("About") {
                     HStack {
@@ -190,6 +205,57 @@ struct TokenInputSheet: View {
             }
         }
         .presentationDetents([.medium])
+    }
+}
+
+
+
+@available(iOS 16.0, *)
+struct WebConnectionView: View {
+    @StateObject private var authService = AuthService.shared
+    @StateObject private var syncService = SyncService.shared
+    @State private var token = ""
+    @State private var serverURL = ""
+
+    var body: some View {
+        Form {
+            Section("Server") {
+                TextField("https://xtmate-v3.vercel.app/api", text: $serverURL)
+                    .autocorrectionDisabled()
+                    .textInputAutocapitalization(.never)
+                Button("Use Production") {
+                    serverURL = "https://xtmate-v3.vercel.app/api"
+                }
+            }
+
+            Section("API Token") {
+                SecureField("Clerk session token", text: $token)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                Text("Paste the session token from the web app. It will be stored in Keychain.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+
+            Section {
+                Button("Save Connection") {
+                    syncService.customServerURL = serverURL.trimmingCharacters(in: .whitespacesAndNewlines)
+                    authService.setToken(token.trimmingCharacters(in: .whitespacesAndNewlines))
+                }
+                .disabled(token.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+
+                if authService.isSignedIn {
+                    Button("Disconnect", role: .destructive) {
+                        authService.signOut()
+                    }
+                }
+            }
+        }
+        .navigationTitle("Connect to Web")
+        .onAppear {
+            token = authService.sessionToken ?? ""
+            serverURL = syncService.currentServerURL
+        }
     }
 }
 

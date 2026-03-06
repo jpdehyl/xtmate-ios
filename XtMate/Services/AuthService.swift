@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import Security
 
 // MARK: - Auth Service
 
@@ -138,21 +139,19 @@ class AuthService: ObservableObject {
 
     private func cacheToken(_ token: String?) {
         if let token = token {
-            // Store in Keychain for production
-            // For now, using UserDefaults (not secure for production)
-            UserDefaults.standard.set(token, forKey: tokenKey)
+            KeychainHelper.save(token, for: tokenKey)
         }
     }
 
     private func loadCachedToken() {
-        if let token = UserDefaults.standard.string(forKey: tokenKey) {
+        if let token = KeychainHelper.load(for: tokenKey) {
             sessionToken = token
             isSignedIn = true
         }
     }
 
     private func clearCachedToken() {
-        UserDefaults.standard.removeObject(forKey: tokenKey)
+        KeychainHelper.delete(for: tokenKey)
     }
 
     private func isTokenValid(_ token: String) -> Bool {
@@ -208,3 +207,46 @@ class AuthService: ObservableObject {
         await checkAuthStatus()
     }
 */
+
+
+// MARK: - Keychain Helper
+
+enum KeychainHelper {
+    static func save(_ value: String, for key: String) {
+        guard let data = value.data(using: .utf8) else { return }
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrAccount as String: key,
+            kSecValueData as String: data
+        ]
+
+        SecItemDelete(query as CFDictionary)
+        SecItemAdd(query as CFDictionary, nil)
+    }
+
+    static func load(for key: String) -> String? {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrAccount as String: key,
+            kSecReturnData as String: true,
+            kSecMatchLimit as String: kSecMatchLimitOne
+        ]
+
+        var item: CFTypeRef?
+        let status = SecItemCopyMatching(query as CFDictionary, &item)
+        guard status == errSecSuccess,
+              let data = item as? Data,
+              let value = String(data: data, encoding: .utf8) else {
+            return nil
+        }
+        return value
+    }
+
+    static func delete(for key: String) {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrAccount as String: key
+        ]
+        SecItemDelete(query as CFDictionary)
+    }
+}

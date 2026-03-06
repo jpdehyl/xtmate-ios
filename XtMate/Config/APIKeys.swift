@@ -54,7 +54,7 @@ enum APIKeys {
         return "http://localhost:3001/api"
         #else
         // Production
-        return "https://xtmate.vercel.app/api"
+        return "https://xtmate-v3.vercel.app/api"
         #endif
     }
 }

@@ -1,22 +1,21 @@
 import SwiftUI
 
-// MARK: - App Theme
+// MARK: - Paul Davis Theme
 
-/// Central design system for XtMate
-/// Following Apple Human Interface Guidelines
-enum AppTheme {
+/// Central design system for XtMate using Paul Davis branding.
+enum PaulDavisTheme {
     // MARK: - Colors
 
     enum Colors {
         // Semantic colors - automatically adapt to light/dark mode
-        static let primary = Color.accentColor
+        static let primary = Color(hex: "E31C23")
         static let secondary = Color.secondary
-        static let background = Color(uiColor: .systemGroupedBackground)
-        static let surface = Color(uiColor: .secondarySystemGroupedBackground)
-        static let cardBackground = Color(uiColor: .systemBackground)
+        static let background = Color(hex: "F5F1E8")
+        static let surface = Color(hex: "F5F1E8").opacity(0.9)
+        static let cardBackground = Color.white
 
         // Text colors
-        static let text = Color.primary
+        static let text = Color(hex: "1C1C1E")
         static let textSecondary = Color.secondary
         static let textTertiary = Color(uiColor: .tertiaryLabel)
 
@@ -144,12 +143,12 @@ extension View {
     /// Apply app card styling
     func appCard() -> some View {
         self
-            .background(AppTheme.Colors.cardBackground)
-            .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous))
+            .background(PaulDavisTheme.Colors.cardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: PaulDavisTheme.Radius.md, style: .continuous))
     }
 
     /// Apply app shadow
-    func appShadow(_ style: ShadowStyle = AppTheme.Shadow.sm) -> some View {
+    func appShadow(_ style: ShadowStyle = PaulDavisTheme.Shadow.sm) -> some View {
         self.shadow(color: style.color, radius: style.radius, x: style.x, y: style.y)
     }
 
@@ -158,6 +157,9 @@ extension View {
         self.clipShape(RoundedRectangle(cornerRadius: radius, style: .continuous))
     }
 }
+
+// Backwards compatibility while migration completes.
+typealias AppTheme = PaulDavisTheme
 
 // MARK: - Color Extensions
 
