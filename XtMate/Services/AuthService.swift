@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import Security
 
 // MARK: - Auth Service
 
@@ -137,22 +138,50 @@ class AuthService: ObservableObject {
     private let tokenKey = "xtmate_auth_token"
 
     private func cacheToken(_ token: String?) {
-        if let token = token {
-            // Store in Keychain for production
-            // For now, using UserDefaults (not secure for production)
-            UserDefaults.standard.set(token, forKey: tokenKey)
-        }
+        guard let token = token else { return }
+
+        let tokenData = Data(token.utf8)
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: tokenKey,
+            kSecAttrAccount as String: tokenKey
+        ]
+
+        SecItemDelete(query as CFDictionary)
+
+        var attributes = query
+        attributes[kSecValueData as String] = tokenData
+        SecItemAdd(attributes as CFDictionary, nil)
     }
 
     private func loadCachedToken() {
-        if let token = UserDefaults.standard.string(forKey: tokenKey) {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: tokenKey,
+            kSecAttrAccount as String: tokenKey,
+            kSecReturnData as String: true,
+            kSecMatchLimit as String: kSecMatchLimitOne
+        ]
+
+        var result: AnyObject?
+        let status = SecItemCopyMatching(query as CFDictionary, &result)
+
+        if status == errSecSuccess,
+           let data = result as? Data,
+           let token = String(data: data, encoding: .utf8) {
             sessionToken = token
             isSignedIn = true
         }
     }
 
     private func clearCachedToken() {
-        UserDefaults.standard.removeObject(forKey: tokenKey)
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: tokenKey,
+            kSecAttrAccount as String: tokenKey
+        ]
+
+        SecItemDelete(query as CFDictionary)
     }
 
     private func isTokenValid(_ token: String) -> Bool {

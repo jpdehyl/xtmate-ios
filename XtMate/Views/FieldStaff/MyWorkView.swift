@@ -40,8 +40,8 @@ struct MyWorkView: View {
                 // Show offline/sync banner when needed
                 if !offlineQueue.pendingItems.isEmpty || !NetworkMonitor.shared.isConnected {
                     NetworkStatusBanner()
-                        .padding(.horizontal, AppTheme.Spacing.lg)
-                        .padding(.top, AppTheme.Spacing.sm)
+                        .padding(.horizontal, PaulDavisTheme.Spacing.lg)
+                        .padding(.top, PaulDavisTheme.Spacing.sm)
                 }
             }
             .refreshable {
@@ -60,7 +60,7 @@ struct MyWorkView: View {
 
     private var workOrdersList: some View {
         ScrollView {
-            LazyVStack(spacing: AppTheme.Spacing.lg) {
+            LazyVStack(spacing: PaulDavisTheme.Spacing.lg) {
                 // Today section
                 if !service.todayOrders.isEmpty {
                     WorkOrderSection(
@@ -94,8 +94,8 @@ struct MyWorkView: View {
                     )
                 }
             }
-            .padding(.horizontal, AppTheme.Spacing.lg)
-            .padding(.vertical, AppTheme.Spacing.md)
+            .padding(.horizontal, PaulDavisTheme.Spacing.lg)
+            .padding(.vertical, PaulDavisTheme.Spacing.md)
         }
     }
 }
@@ -111,9 +111,9 @@ struct WorkOrderSection: View {
     let onSelect: (WorkOrder) -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+        VStack(alignment: .leading, spacing: PaulDavisTheme.Spacing.md) {
             // Section header
-            HStack(spacing: AppTheme.Spacing.sm) {
+            HStack(spacing: PaulDavisTheme.Spacing.sm) {
                 Image(systemName: icon)
                     .foregroundColor(iconColor)
                     .font(.title2)
@@ -128,7 +128,7 @@ struct WorkOrderSection: View {
 
                 Spacer()
             }
-            .padding(.horizontal, AppTheme.Spacing.xs)
+            .padding(.horizontal, PaulDavisTheme.Spacing.xs)
 
             // Work order cards
             ForEach(orders) { order in
@@ -151,7 +151,7 @@ struct WorkOrderRow: View {
     let order: WorkOrder
 
     var body: some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+        VStack(alignment: .leading, spacing: PaulDavisTheme.Spacing.md) {
             // Property address
             Text(order.propertyAddress)
                 .font(.title3) // Larger text for outdoor visibility
@@ -159,10 +159,10 @@ struct WorkOrderRow: View {
                 .lineLimit(2)
 
             // Status and time
-            HStack(spacing: AppTheme.Spacing.lg) {
+            HStack(spacing: PaulDavisTheme.Spacing.lg) {
                 // Scheduled time
                 if let time = order.scheduledTime {
-                    HStack(spacing: AppTheme.Spacing.xs) {
+                    HStack(spacing: PaulDavisTheme.Spacing.xs) {
                         Image(systemName: "clock")
                             .font(.body)
                         Text(time, style: .time)
@@ -177,7 +177,7 @@ struct WorkOrderRow: View {
                 WorkOrderStatusBadge(status: order.status)
 
                 // Progress indicator
-                HStack(spacing: AppTheme.Spacing.xs) {
+                HStack(spacing: PaulDavisTheme.Spacing.xs) {
                     Image(systemName: "checklist")
                         .font(.body)
                     Text("\(order.completedItems)/\(order.totalItems)")
@@ -189,7 +189,7 @@ struct WorkOrderRow: View {
 
             // Priority indicator for high/urgent
             if order.priority == .high || order.priority == .urgent {
-                HStack(spacing: AppTheme.Spacing.xs) {
+                HStack(spacing: PaulDavisTheme.Spacing.xs) {
                     Image(systemName: order.priority.icon)
                         .font(.caption)
                     Text(order.priority.displayName)
@@ -197,15 +197,15 @@ struct WorkOrderRow: View {
                         .fontWeight(.bold)
                 }
                 .foregroundColor(priorityColor)
-                .padding(.horizontal, AppTheme.Spacing.sm)
-                .padding(.vertical, AppTheme.Spacing.xs)
+                .padding(.horizontal, PaulDavisTheme.Spacing.sm)
+                .padding(.vertical, PaulDavisTheme.Spacing.xs)
                 .background(priorityColor.opacity(0.15))
                 .clipShape(Capsule())
             }
 
             // Clocked in indicator
             if order.isClockedIn {
-                HStack(spacing: AppTheme.Spacing.xs) {
+                HStack(spacing: PaulDavisTheme.Spacing.xs) {
                     Image(systemName: "clock.badge.checkmark")
                         .font(.body)
                     Text("Clocked In")
@@ -215,10 +215,10 @@ struct WorkOrderRow: View {
                 .foregroundColor(.orange)
             }
         }
-        .padding(AppTheme.Spacing.lg)
+        .padding(PaulDavisTheme.Spacing.lg)
         .frame(minHeight: 100) // 56pt minimum touch target guideline (with some extra)
-        .background(AppTheme.Colors.cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous))
+        .background(PaulDavisTheme.Colors.cardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: PaulDavisTheme.Radius.md, style: .continuous))
         .shadow(color: .black.opacity(0.05), radius: 2, y: 1)
         .contentShape(Rectangle()) // Makes entire card tappable
     }
@@ -245,8 +245,8 @@ struct WorkOrderStatusBadge: View {
                 .font(.caption)
                 .fontWeight(.semibold)
         }
-        .padding(.horizontal, AppTheme.Spacing.sm)
-        .padding(.vertical, AppTheme.Spacing.xs)
+        .padding(.horizontal, PaulDavisTheme.Spacing.sm)
+        .padding(.vertical, PaulDavisTheme.Spacing.xs)
         .background(statusColor.opacity(0.15))
         .foregroundColor(statusColor)
         .clipShape(Capsule())
@@ -267,7 +267,7 @@ struct WorkOrderStatusBadge: View {
 
 struct EmptyWorkOrdersView: View {
     var body: some View {
-        VStack(spacing: AppTheme.Spacing.xl) {
+        VStack(spacing: PaulDavisTheme.Spacing.xl) {
             Image(systemName: "wrench.and.screwdriver")
                 .font(.system(size: 64))
                 .foregroundColor(.secondary)
@@ -281,7 +281,7 @@ struct EmptyWorkOrdersView: View {
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
         }
-        .padding(AppTheme.Spacing.xxxl)
+        .padding(PaulDavisTheme.Spacing.xxxl)
     }
 }
 

@@ -76,8 +76,8 @@ struct PhotoGalleryView: View {
                     selectedFilter: $selectedFilter,
                     photoCounts: photoCountsByType
                 )
-                .padding(.horizontal, AppTheme.Spacing.lg)
-                .padding(.vertical, AppTheme.Spacing.sm)
+                .padding(.horizontal, PaulDavisTheme.Spacing.lg)
+                .padding(.vertical, PaulDavisTheme.Spacing.sm)
                 .background(Color(uiColor: .secondarySystemBackground))
 
                 // Photo grid or empty state
@@ -87,7 +87,7 @@ struct PhotoGalleryView: View {
                     ScrollView {
                         if selectedFilter == nil {
                             // Grouped by type
-                            LazyVStack(alignment: .leading, spacing: AppTheme.Spacing.lg) {
+                            LazyVStack(alignment: .leading, spacing: PaulDavisTheme.Spacing.lg) {
                                 ForEach(photosByType, id: \.0) { type, photos in
                                     PhotoTypeSection(
                                         type: type,
@@ -100,7 +100,7 @@ struct PhotoGalleryView: View {
                                     )
                                 }
                             }
-                            .padding(AppTheme.Spacing.lg)
+                            .padding(PaulDavisTheme.Spacing.lg)
                         } else {
                             // Flat grid when filtered
                             PhotoGrid(
@@ -111,7 +111,7 @@ struct PhotoGalleryView: View {
                                     showingPhotoDetail = true
                                 }
                             )
-                            .padding(AppTheme.Spacing.lg)
+                            .padding(PaulDavisTheme.Spacing.lg)
                         }
                     }
                 }
@@ -196,7 +196,7 @@ struct PhotoFilterBar: View {
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: AppTheme.Spacing.sm) {
+            HStack(spacing: PaulDavisTheme.Spacing.sm) {
                 // All photos chip
                 FilterChip(
                     label: "All",
@@ -225,7 +225,7 @@ struct PhotoFilterBar: View {
                     }
                 }
             }
-            .padding(.vertical, AppTheme.Spacing.xs)
+            .padding(.vertical, PaulDavisTheme.Spacing.xs)
         }
     }
 }
@@ -277,7 +277,7 @@ struct PhotoTypeSection: View {
     let onPhotoTap: (Photo) -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
+        VStack(alignment: .leading, spacing: PaulDavisTheme.Spacing.sm) {
             // Section header
             HStack(spacing: 8) {
                 Image(systemName: type.icon)
@@ -312,11 +312,11 @@ struct PhotoGrid: View {
     let onPhotoTap: (Photo) -> Void
 
     private var gridColumns: [GridItem] {
-        Array(repeating: GridItem(.flexible(), spacing: AppTheme.Spacing.sm), count: columns)
+        Array(repeating: GridItem(.flexible(), spacing: PaulDavisTheme.Spacing.sm), count: columns)
     }
 
     var body: some View {
-        LazyVGrid(columns: gridColumns, spacing: AppTheme.Spacing.sm) {
+        LazyVGrid(columns: gridColumns, spacing: PaulDavisTheme.Spacing.sm) {
             ForEach(photos) { photo in
                 PhotoThumbnail(photo: photo)
                     .onTapGesture {
@@ -376,9 +376,9 @@ struct PhotoThumbnail: View {
             }
             .padding(4)
         }
-        .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.sm))
+        .clipShape(RoundedRectangle(cornerRadius: PaulDavisTheme.Radius.sm))
         .overlay(
-            RoundedRectangle(cornerRadius: AppTheme.Radius.sm)
+            RoundedRectangle(cornerRadius: PaulDavisTheme.Radius.sm)
                 .stroke(Color(uiColor: .separator), lineWidth: 0.5)
         )
     }
@@ -391,7 +391,7 @@ struct EmptyPhotoState: View {
     let onCapture: () -> Void
 
     var body: some View {
-        VStack(spacing: AppTheme.Spacing.lg) {
+        VStack(spacing: PaulDavisTheme.Spacing.lg) {
             Spacer()
 
             Image(systemName: "photo.on.rectangle.angled")
@@ -416,7 +416,7 @@ struct EmptyPhotoState: View {
                     .background(Color.blue)
                     .clipShape(Capsule())
             }
-            .padding(.top, AppTheme.Spacing.md)
+            .padding(.top, PaulDavisTheme.Spacing.md)
 
             Spacer()
         }
@@ -497,7 +497,7 @@ struct PhotoDetailView: View {
 
                     // Photo info panel
                     ScrollView {
-                        VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+                        VStack(alignment: .leading, spacing: PaulDavisTheme.Spacing.md) {
                             // Type and date
                             HStack {
                                 Label(currentPhoto.type.displayName, systemImage: currentPhoto.type.icon)
@@ -557,7 +557,7 @@ struct PhotoDetailView: View {
                                     .frame(maxWidth: .infinity, alignment: .center)
                             }
                         }
-                        .padding(AppTheme.Spacing.lg)
+                        .padding(PaulDavisTheme.Spacing.lg)
                     }
                 }
             }

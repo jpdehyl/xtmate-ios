@@ -58,14 +58,14 @@ struct PhotoCaptureView: View {
                 VStack(spacing: 0) {
                     // Top bar with photo type chips
                     PhotoTypeChipBar(selectedType: $selectedType)
-                        .padding(.horizontal, AppTheme.Spacing.lg)
-                        .padding(.top, AppTheme.Spacing.md)
+                        .padding(.horizontal, PaulDavisTheme.Spacing.lg)
+                        .padding(.top, PaulDavisTheme.Spacing.md)
 
                     // Camera preview area (placeholder - actual camera in sheet)
                     ZStack {
                         Color(.systemGray6)
 
-                        VStack(spacing: AppTheme.Spacing.xl) {
+                        VStack(spacing: PaulDavisTheme.Spacing.xl) {
                             Image(systemName: "camera.fill")
                                 .font(.system(size: 80))
                                 .foregroundColor(.gray)
@@ -109,8 +109,8 @@ struct PhotoCaptureView: View {
                         onLibrarySelect: { showingLibrary = true },
                         onDone: finishCapture
                     )
-                    .padding(.horizontal, AppTheme.Spacing.lg)
-                    .padding(.bottom, AppTheme.Spacing.xl)
+                    .padding(.horizontal, PaulDavisTheme.Spacing.lg)
+                    .padding(.bottom, PaulDavisTheme.Spacing.xl)
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
@@ -195,7 +195,7 @@ struct PhotoTypeChipBar: View {
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: AppTheme.Spacing.sm) {
+            HStack(spacing: PaulDavisTheme.Spacing.sm) {
                 ForEach(PhotoType.allCases) { type in
                     PhotoTypeChip(
                         type: type,
@@ -210,7 +210,7 @@ struct PhotoTypeChipBar: View {
                     )
                 }
             }
-            .padding(.vertical, AppTheme.Spacing.sm)
+            .padding(.vertical, PaulDavisTheme.Spacing.sm)
         }
     }
 }
@@ -252,9 +252,9 @@ struct CaptureControlBar: View {
     let onDone: () -> Void
 
     var body: some View {
-        HStack(spacing: AppTheme.Spacing.xl) {
+        HStack(spacing: PaulDavisTheme.Spacing.xl) {
             // Left: Flash toggle + Library
-            HStack(spacing: AppTheme.Spacing.md) {
+            HStack(spacing: PaulDavisTheme.Spacing.md) {
                 // Flash toggle
                 Button(action: {
                     flashEnabled.toggle()
@@ -314,7 +314,7 @@ struct CaptureControlBar: View {
                 .frame(minWidth: 80, minHeight: 56) // 56pt touch target
             }
         }
-        .padding(.vertical, AppTheme.Spacing.md)
+        .padding(.vertical, PaulDavisTheme.Spacing.md)
     }
 }
 

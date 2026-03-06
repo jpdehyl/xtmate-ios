@@ -103,7 +103,7 @@ struct NewClaimSheet: View {
 
     private var emailPasteSection: some View {
         Section {
-            VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+            VStack(alignment: .leading, spacing: PaulDavisTheme.Spacing.md) {
                 Text("Paste your dispatch email from XactAnalysis")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
@@ -112,7 +112,7 @@ struct NewClaimSheet: View {
                     .frame(minHeight: 200)
                     .font(.system(.caption, design: .monospaced))
                     .overlay(
-                        RoundedRectangle(cornerRadius: AppTheme.Radius.sm)
+                        RoundedRectangle(cornerRadius: PaulDavisTheme.Radius.sm)
                             .strokeBorder(Color.secondary.opacity(0.3))
                     )
 

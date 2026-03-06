@@ -144,7 +144,7 @@ struct NetworkStatusBanner: View {
 
     var body: some View {
         if !monitor.isConnected || !offlineQueue.pendingItems.isEmpty {
-            HStack(spacing: AppTheme.Spacing.sm) {
+            HStack(spacing: PaulDavisTheme.Spacing.sm) {
                 Image(systemName: monitor.isConnected ? "arrow.triangle.2.circlepath" : "wifi.slash")
                     .font(.caption)
 
@@ -163,8 +163,8 @@ struct NetworkStatusBanner: View {
                     }
                 }
             }
-            .padding(.horizontal, AppTheme.Spacing.md)
-            .padding(.vertical, AppTheme.Spacing.sm)
+            .padding(.horizontal, PaulDavisTheme.Spacing.md)
+            .padding(.vertical, PaulDavisTheme.Spacing.sm)
             .background(monitor.isConnected ? Color.orange : Color.red)
             .foregroundColor(.white)
             .clipShape(Capsule())

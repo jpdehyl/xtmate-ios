@@ -10,7 +10,7 @@ struct AssignmentCard: View {
 
     var body: some View {
         Button(action: { onTap?() }) {
-            VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
+            VStack(alignment: .leading, spacing: PaulDavisTheme.Spacing.sm) {
                 // Header with type badge and status
                 HStack {
                     // Type badge
@@ -36,15 +36,15 @@ struct AssignmentCard: View {
                     .font(.system(.title3, design: .rounded, weight: .semibold))
                     .foregroundStyle(.primary)
             }
-            .padding(AppTheme.Spacing.md)
+            .padding(PaulDavisTheme.Spacing.md)
             .frame(width: 140, height: 130)
-            .background(isSelected ? assignment.type.color.opacity(0.1) : AppTheme.Colors.cardBackground)
+            .background(isSelected ? assignment.type.color.opacity(0.1) : PaulDavisTheme.Colors.cardBackground)
             .overlay(
-                RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous)
+                RoundedRectangle(cornerRadius: PaulDavisTheme.Radius.md, style: .continuous)
                     .strokeBorder(isSelected ? assignment.type.color : Color.clear, lineWidth: 2)
             )
-            .continuousCornerRadius(AppTheme.Radius.md)
-            .appShadow(AppTheme.Shadow.sm)
+            .continuousCornerRadius(PaulDavisTheme.Radius.md)
+            .appShadow(PaulDavisTheme.Shadow.sm)
         }
         .buttonStyle(.plain)
     }
@@ -76,7 +76,7 @@ struct StatusBadge: View {
         .padding(.horizontal, 8)
         .padding(.vertical, 4)
         .background(status.color.opacity(0.15))
-        .continuousCornerRadius(AppTheme.Radius.full)
+        .continuousCornerRadius(PaulDavisTheme.Radius.full)
     }
 }
 
@@ -90,17 +90,17 @@ struct AssignmentsRow: View {
     var onTapAssignment: ((Assignment) -> Void)?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+        VStack(alignment: .leading, spacing: PaulDavisTheme.Spacing.md) {
             // Header
             HStack {
-                Label("Assignments", systemImage: AppTheme.Icons.scope)
+                Label("Assignments", systemImage: PaulDavisTheme.Icons.scope)
                     .font(.headline)
 
                 Spacer()
 
                 if let onAdd = onAddAssignment {
                     Button(action: onAdd) {
-                        Label("Add", systemImage: AppTheme.Icons.add)
+                        Label("Add", systemImage: PaulDavisTheme.Icons.add)
                             .font(.subheadline)
                     }
                 }
@@ -108,7 +108,7 @@ struct AssignmentsRow: View {
 
             // Cards scroll view
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: AppTheme.Spacing.md) {
+                HStack(spacing: PaulDavisTheme.Spacing.md) {
                     ForEach(assignments.sorted { $0.order < $1.order }) { assignment in
                         AssignmentCard(
                             assignment: assignment,
@@ -144,8 +144,8 @@ struct AddAssignmentCard: View {
 
     var body: some View {
         Button(action: { onTap?() }) {
-            VStack(spacing: AppTheme.Spacing.sm) {
-                Image(systemName: AppTheme.Icons.add)
+            VStack(spacing: PaulDavisTheme.Spacing.sm) {
+                Image(systemName: PaulDavisTheme.Icons.add)
                     .font(.title)
                     .foregroundStyle(.secondary)
 
@@ -155,9 +155,9 @@ struct AddAssignmentCard: View {
             }
             .frame(width: 140, height: 130)
             .background(Color(uiColor: .systemGray6))
-            .continuousCornerRadius(AppTheme.Radius.md)
+            .continuousCornerRadius(PaulDavisTheme.Radius.md)
             .overlay(
-                RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous)
+                RoundedRectangle(cornerRadius: PaulDavisTheme.Radius.md, style: .continuous)
                     .strokeBorder(style: StrokeStyle(lineWidth: 2, dash: [6]))
                     .foregroundStyle(Color.secondary.opacity(0.5))
             )
@@ -173,7 +173,7 @@ struct SequentialFlowIndicator: View {
     let assignments: [Assignment]
 
     var body: some View {
-        HStack(spacing: AppTheme.Spacing.xs) {
+        HStack(spacing: PaulDavisTheme.Spacing.xs) {
             ForEach(Array(assignments.sorted { $0.order < $1.order }.enumerated()), id: \.element.id) { index, assignment in
                 if index > 0 {
                     Image(systemName: "arrow.right")
@@ -193,7 +193,7 @@ struct SequentialFlowIndicator: View {
                 .font(.caption2)
                 .foregroundStyle(.tertiary)
         }
-        .padding(.horizontal, AppTheme.Spacing.xs)
+        .padding(.horizontal, PaulDavisTheme.Spacing.xs)
     }
 }
 

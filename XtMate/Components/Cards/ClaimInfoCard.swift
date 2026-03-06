@@ -31,8 +31,8 @@ struct ClaimInfoCard: View {
                             .foregroundStyle(.white)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 4)
-                            .background(AppTheme.Colors.primary)
-                            .continuousCornerRadius(AppTheme.Radius.xs)
+                            .background(PaulDavisTheme.Colors.primary)
+                            .continuousCornerRadius(PaulDavisTheme.Radius.xs)
                     }
 
                     // Loss type badge
@@ -47,7 +47,7 @@ struct ClaimInfoCard: View {
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
                         .background(lossType.color.opacity(0.15))
-                        .continuousCornerRadius(AppTheme.Radius.xs)
+                        .continuousCornerRadius(PaulDavisTheme.Radius.xs)
                     }
 
                     Spacer()
@@ -63,16 +63,16 @@ struct ClaimInfoCard: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
-                .padding(AppTheme.Spacing.md)
+                .padding(PaulDavisTheme.Spacing.md)
             }
             .buttonStyle(.plain)
 
             // Expanded content
             if isExpanded {
                 Divider()
-                    .padding(.horizontal, AppTheme.Spacing.md)
+                    .padding(.horizontal, PaulDavisTheme.Spacing.md)
 
-                VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+                VStack(alignment: .leading, spacing: PaulDavisTheme.Spacing.md) {
                     // Insured section
                     if insuredName != nil || insuredPhone != nil {
                         ContactSection(
@@ -98,12 +98,12 @@ struct ClaimInfoCard: View {
                         AddressSection(address: address)
                     }
                 }
-                .padding(AppTheme.Spacing.md)
+                .padding(PaulDavisTheme.Spacing.md)
             }
         }
-        .background(AppTheme.Colors.cardBackground)
-        .continuousCornerRadius(AppTheme.Radius.md)
-        .appShadow(AppTheme.Shadow.sm)
+        .background(PaulDavisTheme.Colors.cardBackground)
+        .continuousCornerRadius(PaulDavisTheme.Radius.md)
+        .appShadow(PaulDavisTheme.Shadow.sm)
     }
 
     private var formattedAddress: String? {
@@ -130,7 +130,7 @@ private struct ContactSection: View {
     let email: String?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
+        VStack(alignment: .leading, spacing: PaulDavisTheme.Spacing.xs) {
             Text(title.uppercased())
                 .font(.caption2)
                 .fontWeight(.semibold)
@@ -147,17 +147,17 @@ private struct ContactSection: View {
 
                 if let phone = phone {
                     Button(action: { callPhone(phone) }) {
-                        Label(phone, systemImage: AppTheme.Icons.call)
+                        Label(phone, systemImage: PaulDavisTheme.Icons.call)
                             .font(.caption)
-                            .foregroundStyle(AppTheme.Colors.primary)
+                            .foregroundStyle(PaulDavisTheme.Colors.primary)
                     }
                 }
 
                 if let email = email {
                     Button(action: { sendEmail(email) }) {
-                        Image(systemName: AppTheme.Icons.email)
+                        Image(systemName: PaulDavisTheme.Icons.email)
                             .font(.caption)
-                            .foregroundStyle(AppTheme.Colors.primary)
+                            .foregroundStyle(PaulDavisTheme.Colors.primary)
                     }
                 }
             }
@@ -184,7 +184,7 @@ private struct AddressSection: View {
     let address: String
 
     var body: some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
+        VStack(alignment: .leading, spacing: PaulDavisTheme.Spacing.xs) {
             Text("PROPERTY")
                 .font(.caption2)
                 .fontWeight(.semibold)
@@ -199,8 +199,8 @@ private struct AddressSection: View {
 
                     Spacer()
 
-                    Image(systemName: AppTheme.Icons.map)
-                        .foregroundStyle(AppTheme.Colors.primary)
+                    Image(systemName: PaulDavisTheme.Icons.map)
+                        .foregroundStyle(PaulDavisTheme.Colors.primary)
                 }
             }
         }
@@ -225,7 +225,7 @@ struct CompactClaimHeader: View {
 
     var body: some View {
         Button(action: { onTap?() }) {
-            HStack(spacing: AppTheme.Spacing.sm) {
+            HStack(spacing: PaulDavisTheme.Spacing.sm) {
                 // Loss type icon
                 if let lossType = lossType {
                     Image(systemName: lossType.icon)
@@ -251,9 +251,9 @@ struct CompactClaimHeader: View {
                 Image(systemName: "info.circle")
                     .foregroundStyle(.secondary)
             }
-            .padding(AppTheme.Spacing.md)
-            .background(AppTheme.Colors.cardBackground)
-            .continuousCornerRadius(AppTheme.Radius.md)
+            .padding(PaulDavisTheme.Spacing.md)
+            .background(PaulDavisTheme.Colors.cardBackground)
+            .continuousCornerRadius(PaulDavisTheme.Radius.md)
         }
         .buttonStyle(.plain)
     }

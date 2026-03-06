@@ -16,9 +16,9 @@ struct MaterialTaggingView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: AppTheme.Spacing.xxl) {
+                VStack(spacing: PaulDavisTheme.Spacing.xxl) {
                     // Header
-                    VStack(spacing: AppTheme.Spacing.sm) {
+                    VStack(spacing: PaulDavisTheme.Spacing.sm) {
                         Image(systemName: "paintpalette.fill")
                             .font(.system(size: 48))
                             .foregroundStyle(.purple)
@@ -30,7 +30,7 @@ struct MaterialTaggingView: View {
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }
-                    .padding(.top, AppTheme.Spacing.lg)
+                    .padding(.top, PaulDavisTheme.Spacing.lg)
                     
                     // Floor Material
                     MaterialTaggingSection(
@@ -59,9 +59,9 @@ struct MaterialTaggingView: View {
                         suggestedMaterials: suggestedCeilingMaterials
                     )
                 }
-                .padding(AppTheme.Spacing.lg)
+                .padding(PaulDavisTheme.Spacing.lg)
             }
-            .background(AppTheme.Colors.background)
+            .background(PaulDavisTheme.Colors.background)
             .navigationTitle("Materials")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -159,9 +159,9 @@ private struct MaterialTaggingSection: View {
     let suggestedMaterials: [String]
     
     var body: some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+        VStack(alignment: .leading, spacing: PaulDavisTheme.Spacing.md) {
             // Section header
-            HStack(spacing: AppTheme.Spacing.sm) {
+            HStack(spacing: PaulDavisTheme.Spacing.sm) {
                 Image(systemName: icon)
                     .font(.title3)
                     .foregroundStyle(.secondary)
@@ -174,13 +174,13 @@ private struct MaterialTaggingSection: View {
             
             // Suggested materials (if any)
             if !suggestedMaterials.isEmpty {
-                VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
+                VStack(alignment: .leading, spacing: PaulDavisTheme.Spacing.xs) {
                     Text("Suggested")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     
                     ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: AppTheme.Spacing.sm) {
+                        HStack(spacing: PaulDavisTheme.Spacing.sm) {
                             ForEach(suggestedMaterials, id: \.self) { material in
                                 MaterialChip(
                                     material: material,
@@ -200,7 +200,7 @@ private struct MaterialTaggingSection: View {
                     GridItem(.flexible()),
                     GridItem(.flexible())
                 ],
-                spacing: AppTheme.Spacing.sm
+                spacing: PaulDavisTheme.Spacing.sm
             ) {
                 ForEach(materials, id: \.self) { material in
                     MaterialCard(
@@ -232,11 +232,11 @@ private struct MaterialChip: View {
                 Text(material)
                     .font(.subheadline.weight(.medium))
             }
-            .padding(.horizontal, AppTheme.Spacing.md)
-            .padding(.vertical, AppTheme.Spacing.sm)
+            .padding(.horizontal, PaulDavisTheme.Spacing.md)
+            .padding(.vertical, PaulDavisTheme.Spacing.sm)
             .background(isSelected ? Color.purple : Color.purple.opacity(0.15))
             .foregroundStyle(isSelected ? .white : .purple)
-            .continuousCornerRadius(AppTheme.Radius.full)
+            .continuousCornerRadius(PaulDavisTheme.Radius.full)
         }
         .buttonStyle(.plain)
     }
@@ -263,13 +263,13 @@ private struct MaterialCard: View {
                         .foregroundStyle(.white)
                 }
             }
-            .padding(AppTheme.Spacing.md)
+            .padding(PaulDavisTheme.Spacing.md)
             .frame(height: 56)
-            .background(isSelected ? AppTheme.Colors.primary : AppTheme.Colors.cardBackground)
-            .continuousCornerRadius(AppTheme.Radius.md)
+            .background(isSelected ? PaulDavisTheme.Colors.primary : PaulDavisTheme.Colors.cardBackground)
+            .continuousCornerRadius(PaulDavisTheme.Radius.md)
             .overlay(
-                RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous)
-                    .strokeBorder(isSelected ? AppTheme.Colors.primary : Color.secondary.opacity(0.2), lineWidth: isSelected ? 2 : 1)
+                RoundedRectangle(cornerRadius: PaulDavisTheme.Radius.md, style: .continuous)
+                    .strokeBorder(isSelected ? PaulDavisTheme.Colors.primary : Color.secondary.opacity(0.2), lineWidth: isSelected ? 2 : 1)
             )
         }
         .buttonStyle(.plain)
