@@ -161,7 +161,7 @@ struct TokenInputSheet: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: AppTheme.Spacing.lg) {
+            VStack(spacing: PaulDavisTheme.Spacing.lg) {
                 Text("Enter your authentication token from the web app.")
                     .font(.body)
                     .foregroundColor(.secondary)
@@ -176,7 +176,7 @@ struct TokenInputSheet: View {
 
                 Spacer()
             }
-            .padding(.top, AppTheme.Spacing.xl)
+            .padding(.top, PaulDavisTheme.Spacing.xl)
             .navigationTitle("Auth Token")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

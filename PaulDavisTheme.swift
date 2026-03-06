@@ -10,9 +10,9 @@ enum PaulDavisTheme {
     
     enum Colors {
         // Primary brand colors (from Paul Davis identity)
-        static let paulDavisRed = Color(red: 0.84, green: 0.15, blue: 0.16)      // #D62728 - Signature red
-        static let darkNavy = Color(red: 0.11, green: 0.18, blue: 0.27)          // #1C2E45 - Professional navy
-        static let lightGray = Color(red: 0.95, green: 0.95, blue: 0.96)         // #F2F2F4 - Soft background
+        static let paulDavisRed = Color(hex: "#E31C23")      // #E31C23 - Paul Davis red
+        static let darkNavy = Color(hex: "#1C1C1E")          // #1C1C1E - Paul Davis dark
+        static let lightGray = Color(hex: "#F5F1E8")         // #F5F1E8 - Paul Davis cream
         static let charcoal = Color(red: 0.20, green: 0.24, blue: 0.29)          // #333C4A - Dark text
         
         // Primary/Accent
@@ -25,9 +25,9 @@ enum PaulDavisTheme {
         static let secondaryLight = Color(red: 0.25, green: 0.35, blue: 0.45)    // Lighter navy
         
         // Semantic colors (system-aware)
-        static let background = Color(uiColor: .systemGroupedBackground)
+        static let background = lightGray
         static let surface = Color(uiColor: .secondarySystemGroupedBackground)
-        static let cardBackground = Color(uiColor: .systemBackground)
+        static let cardBackground = Color.white
         
         // Text colors
         static let text = Color.primary

@@ -54,7 +54,7 @@ struct PostScanQuickActionsView: View {
         NavigationStack {
             VStack(spacing: 0) {
                 // Success header
-                VStack(spacing: AppTheme.Spacing.lg) {
+                VStack(spacing: PaulDavisTheme.Spacing.lg) {
                     // Success animation
                     ZStack {
                         Circle()
@@ -65,14 +65,14 @@ struct PostScanQuickActionsView: View {
                             .font(.system(size: 64))
                             .foregroundStyle(.green)
                     }
-                    .padding(.top, AppTheme.Spacing.xxl)
+                    .padding(.top, PaulDavisTheme.Spacing.xxl)
                     
                     // Room info
-                    VStack(spacing: AppTheme.Spacing.xs) {
+                    VStack(spacing: PaulDavisTheme.Spacing.xs) {
                         Text(room.name)
                             .font(.title.weight(.bold))
                         
-                        HStack(spacing: AppTheme.Spacing.md) {
+                        HStack(spacing: PaulDavisTheme.Spacing.md) {
                             Label("\(Int(room.squareFeet)) SF", systemImage: "ruler")
                             Label(room.category, systemImage: categoryIcon(room.category))
                         }
@@ -81,13 +81,13 @@ struct PostScanQuickActionsView: View {
                     }
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.bottom, AppTheme.Spacing.xl)
-                .background(AppTheme.Colors.cardBackground)
+                .padding(.bottom, PaulDavisTheme.Spacing.xl)
+                .background(PaulDavisTheme.Colors.cardBackground)
                 
                 // Quick Actions Grid
                 ScrollView {
-                    VStack(alignment: .leading, spacing: AppTheme.Spacing.lg) {
-                        VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
+                    VStack(alignment: .leading, spacing: PaulDavisTheme.Spacing.lg) {
+                        VStack(alignment: .leading, spacing: PaulDavisTheme.Spacing.xs) {
                             Text("Next Steps")
                                 .font(.headline)
                             
@@ -95,15 +95,15 @@ struct PostScanQuickActionsView: View {
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
-                        .padding(.horizontal, AppTheme.Spacing.lg)
-                        .padding(.top, AppTheme.Spacing.lg)
+                        .padding(.horizontal, PaulDavisTheme.Spacing.lg)
+                        .padding(.top, PaulDavisTheme.Spacing.lg)
                         
                         LazyVGrid(
                             columns: [
                                 GridItem(.flexible()),
                                 GridItem(.flexible())
                             ],
-                            spacing: AppTheme.Spacing.md
+                            spacing: PaulDavisTheme.Spacing.md
                         ) {
                             ForEach(QuickAction.allCases) { action in
                                 QuickActionButton(
@@ -119,13 +119,13 @@ struct PostScanQuickActionsView: View {
                                 )
                             }
                         }
-                        .padding(.horizontal, AppTheme.Spacing.lg)
+                        .padding(.horizontal, PaulDavisTheme.Spacing.lg)
                     }
-                    .padding(.bottom, AppTheme.Spacing.xxl)
+                    .padding(.bottom, PaulDavisTheme.Spacing.xxl)
                 }
                 
                 // Bottom actions
-                VStack(spacing: AppTheme.Spacing.sm) {
+                VStack(spacing: PaulDavisTheme.Spacing.sm) {
                     Button(action: {
                         executeSelectedActions()
                     }) {
@@ -137,10 +137,10 @@ struct PostScanQuickActionsView: View {
                             }
                         }
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, AppTheme.Spacing.md)
-                        .background(AppTheme.Colors.primary)
+                        .padding(.vertical, PaulDavisTheme.Spacing.md)
+                        .background(PaulDavisTheme.Colors.primary)
                         .foregroundStyle(.white)
-                        .continuousCornerRadius(AppTheme.Radius.md)
+                        .continuousCornerRadius(PaulDavisTheme.Radius.md)
                     }
                     
                     if !selectedActions.isEmpty {
@@ -151,10 +151,10 @@ struct PostScanQuickActionsView: View {
                         }
                     }
                 }
-                .padding(AppTheme.Spacing.lg)
+                .padding(PaulDavisTheme.Spacing.lg)
                 .background(.ultraThinMaterial)
             }
-            .background(AppTheme.Colors.background)
+            .background(PaulDavisTheme.Colors.background)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -214,14 +214,14 @@ private struct QuickActionButton: View {
     
     var body: some View {
         Button(action: onTap) {
-            VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+            VStack(alignment: .leading, spacing: PaulDavisTheme.Spacing.md) {
                 HStack {
                     Image(systemName: action.icon)
                         .font(.title2)
                         .foregroundStyle(isSelected ? .white : action.color)
                         .frame(width: 48, height: 48)
                         .background((isSelected ? action.color : action.color.opacity(0.15)))
-                        .continuousCornerRadius(AppTheme.Radius.sm)
+                        .continuousCornerRadius(PaulDavisTheme.Radius.sm)
                     
                     Spacer()
                     
@@ -243,16 +243,16 @@ private struct QuickActionButton: View {
                         .lineLimit(2)
                 }
             }
-            .padding(AppTheme.Spacing.md)
+            .padding(PaulDavisTheme.Spacing.md)
             .frame(maxWidth: .infinity, alignment: .leading)
             .frame(height: 130)
-            .background(isSelected ? action.color.opacity(0.1) : AppTheme.Colors.cardBackground)
-            .continuousCornerRadius(AppTheme.Radius.md)
+            .background(isSelected ? action.color.opacity(0.1) : PaulDavisTheme.Colors.cardBackground)
+            .continuousCornerRadius(PaulDavisTheme.Radius.md)
             .overlay(
-                RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous)
+                RoundedRectangle(cornerRadius: PaulDavisTheme.Radius.md, style: .continuous)
                     .strokeBorder(isSelected ? action.color : Color.clear, lineWidth: 2)
             )
-            .appShadow(AppTheme.Shadow.sm)
+            .appShadow(PaulDavisTheme.Shadow.sm)
         }
         .buttonStyle(.plain)
     }

@@ -67,7 +67,7 @@ struct RoomsListCard: View {
         VStack(alignment: .leading, spacing: 0) {
             // Header
             HStack {
-                Label("Rooms", systemImage: AppTheme.Icons.room)
+                Label("Rooms", systemImage: PaulDavisTheme.Icons.room)
                     .font(.headline)
 
                 Spacer()
@@ -76,7 +76,7 @@ struct RoomsListCard: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
-            .padding(AppTheme.Spacing.md)
+            .padding(PaulDavisTheme.Spacing.md)
 
             Divider()
 
@@ -110,17 +110,17 @@ struct RoomsListCard: View {
 
                 // Capture button
                 Button(action: { onCaptureRoom?() }) {
-                    Label("Capture Room", systemImage: AppTheme.Icons.scan)
+                    Label("Capture Room", systemImage: PaulDavisTheme.Icons.scan)
                         .font(.subheadline)
                         .fontWeight(.medium)
                         .frame(maxWidth: .infinity)
-                        .padding(AppTheme.Spacing.md)
+                        .padding(PaulDavisTheme.Spacing.md)
                 }
             }
         }
-        .background(AppTheme.Colors.cardBackground)
-        .continuousCornerRadius(AppTheme.Radius.md)
-        .appShadow(AppTheme.Shadow.sm)
+        .background(PaulDavisTheme.Colors.cardBackground)
+        .continuousCornerRadius(PaulDavisTheme.Radius.md)
+        .appShadow(PaulDavisTheme.Shadow.sm)
     }
 }
 
@@ -177,11 +177,11 @@ private struct RoomRow: View {
 
     private var mainRowContent: some View {
         Button(action: { onTap?() }) {
-            HStack(spacing: AppTheme.Spacing.md) {
+            HStack(spacing: PaulDavisTheme.Spacing.md) {
                 // Room icon
                 Image(systemName: room.icon)
                     .font(.title3)
-                    .foregroundStyle(isSelected ? AppTheme.Colors.primary : .secondary)
+                    .foregroundStyle(isSelected ? PaulDavisTheme.Colors.primary : .secondary)
                     .frame(width: 32)
 
                 // Room info
@@ -226,7 +226,7 @@ private struct RoomRow: View {
                 Spacer()
 
                 // Status indicators
-                HStack(spacing: AppTheme.Spacing.sm) {
+                HStack(spacing: PaulDavisTheme.Spacing.sm) {
                     // P3-020: Tappable damage count badge
                     if room.damageCount > 0 {
                         Button(action: {
@@ -262,8 +262,8 @@ private struct RoomRow: View {
                     .font(.caption)
                     .foregroundStyle(.tertiary)
             }
-            .padding(AppTheme.Spacing.md)
-            .background(isSelected ? AppTheme.Colors.primary.opacity(0.1) : Color.clear)
+            .padding(PaulDavisTheme.Spacing.md)
+            .background(isSelected ? PaulDavisTheme.Colors.primary.opacity(0.1) : Color.clear)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -301,7 +301,7 @@ private struct AnnotationRowView: View {
 
     var body: some View {
         Button(action: { onTap?() }) {
-            HStack(spacing: AppTheme.Spacing.md) {
+            HStack(spacing: PaulDavisTheme.Spacing.md) {
                 // Damage type icon with severity color
                 ZStack {
                     Circle()
@@ -348,8 +348,8 @@ private struct AnnotationRowView: View {
                     .font(.caption2)
                     .foregroundStyle(.tertiary)
             }
-            .padding(.horizontal, AppTheme.Spacing.md)
-            .padding(.vertical, AppTheme.Spacing.sm)
+            .padding(.horizontal, PaulDavisTheme.Spacing.md)
+            .padding(.vertical, PaulDavisTheme.Spacing.sm)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -400,12 +400,12 @@ private struct EmptyRoomsView: View {
     var onCapture: (() -> Void)?
 
     var body: some View {
-        VStack(spacing: AppTheme.Spacing.lg) {
+        VStack(spacing: PaulDavisTheme.Spacing.lg) {
             Image(systemName: "viewfinder")
                 .font(.system(size: 48))
                 .foregroundStyle(.secondary)
 
-            VStack(spacing: AppTheme.Spacing.xs) {
+            VStack(spacing: PaulDavisTheme.Spacing.xs) {
                 Text("No rooms captured")
                     .font(.headline)
 
@@ -415,17 +415,17 @@ private struct EmptyRoomsView: View {
             }
 
             Button(action: { onCapture?() }) {
-                Label("Capture First Room", systemImage: AppTheme.Icons.scan)
+                Label("Capture First Room", systemImage: PaulDavisTheme.Icons.scan)
                     .font(.headline)
                     .foregroundStyle(.white)
-                    .padding(.horizontal, AppTheme.Spacing.xl)
-                    .padding(.vertical, AppTheme.Spacing.md)
-                    .background(AppTheme.Colors.primary)
-                    .continuousCornerRadius(AppTheme.Radius.md)
+                    .padding(.horizontal, PaulDavisTheme.Spacing.xl)
+                    .padding(.vertical, PaulDavisTheme.Spacing.md)
+                    .background(PaulDavisTheme.Colors.primary)
+                    .continuousCornerRadius(PaulDavisTheme.Radius.md)
             }
         }
         .frame(maxWidth: .infinity)
-        .padding(AppTheme.Spacing.xxl)
+        .padding(PaulDavisTheme.Spacing.xxl)
     }
 }
 
@@ -440,7 +440,7 @@ struct CompactRoomsSummary: View {
     var body: some View {
         Button(action: { onTap?() }) {
             HStack {
-                Image(systemName: AppTheme.Icons.room)
+                Image(systemName: PaulDavisTheme.Icons.room)
                     .foregroundStyle(.secondary)
 
                 Text("\(roomCount) room\(roomCount == 1 ? "" : "s")")
@@ -458,9 +458,9 @@ struct CompactRoomsSummary: View {
                     .font(.caption)
                     .foregroundStyle(.tertiary)
             }
-            .padding(AppTheme.Spacing.md)
-            .background(AppTheme.Colors.cardBackground)
-            .continuousCornerRadius(AppTheme.Radius.md)
+            .padding(PaulDavisTheme.Spacing.md)
+            .background(PaulDavisTheme.Colors.cardBackground)
+            .continuousCornerRadius(PaulDavisTheme.Radius.md)
         }
         .buttonStyle(.plain)
     }

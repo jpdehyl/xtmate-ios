@@ -12,6 +12,7 @@ struct HomeDashboardView: View {
     @State private var showingOnboarding = false
     @State private var searchText = ""
     @State private var selectedFilter: ClaimFilter = .all
+    @State private var showingConnectSheet = false
 
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
     
@@ -36,7 +37,7 @@ struct HomeDashboardView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: AppTheme.Spacing.lg) {
+                VStack(spacing: PaulDavisTheme.Spacing.lg) {
                     // Status Cards Section
                     statusCardsSection
                     
@@ -46,23 +47,16 @@ struct HomeDashboardView: View {
                     // Claims List
                     claimsSection
                 }
-                .padding(.horizontal, AppTheme.Spacing.lg)
-                .padding(.bottom, AppTheme.Spacing.xl)
+                .padding(.horizontal, PaulDavisTheme.Spacing.lg)
+                .padding(.bottom, PaulDavisTheme.Spacing.xl)
             }
-            .background(AppTheme.Colors.background)
+            .background(PaulDavisTheme.Colors.background)
             .navigationTitle("XtMate")
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button(action: {}) {
-                        Image(systemName: "line.3.horizontal")
-                            .font(.title3)
-                    }
-                }
-                
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button(action: {}) {
-                        Image(systemName: "person.circle")
+                    Button(action: { showingConnectSheet = true }) {
+                        Image(systemName: "gearshape.fill")
                             .font(.title3)
                     }
                 }
@@ -82,6 +76,9 @@ struct HomeDashboardView: View {
             .sheet(isPresented: $showingOnboarding) {
                 OnboardingView()
             }
+            .sheet(isPresented: $showingConnectSheet) {
+                ConnectToWebSettingsView()
+            }
             .refreshable {
                 await viewModel.syncAll()
             }
@@ -96,7 +93,15 @@ struct HomeDashboardView: View {
     // MARK: - Status Cards Section
     
     private var statusCardsSection: some View {
-        VStack(spacing: AppTheme.Spacing.md) {
+        VStack(spacing: PaulDavisTheme.Spacing.md) {
+            if !AuthService.shared.isSignedIn {
+                UrgentBanner(
+                    icon: "gearshape.2.fill",
+                    title: "⚙️ Connect to Web",
+                    action: { showingConnectSheet = true }
+                )
+            }
+
             // Urgent banner if needed
             if viewModel.pendingSyncCount > 0 {
                 UrgentBanner(
@@ -111,7 +116,7 @@ struct HomeDashboardView: View {
             }
             
             // Stats row
-            HStack(spacing: AppTheme.Spacing.md) {
+            HStack(spacing: PaulDavisTheme.Spacing.md) {
                 StatCard(
                     icon: "doc.text.fill",
                     label: "Total",
@@ -134,14 +139,14 @@ struct HomeDashboardView: View {
                 )
             }
         }
-        .padding(.top, AppTheme.Spacing.sm)
+        .padding(.top, PaulDavisTheme.Spacing.sm)
     }
     
     // MARK: - Filter Section
     
     private var filterSection: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: AppTheme.Spacing.sm) {
+            HStack(spacing: PaulDavisTheme.Spacing.sm) {
                 ForEach(ClaimFilter.allCases, id: \.self) { filter in
                     FilterPill(
                         filter: filter,
@@ -160,7 +165,7 @@ struct HomeDashboardView: View {
     // MARK: - Claims Section
     
     private var claimsSection: some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+        VStack(alignment: .leading, spacing: PaulDavisTheme.Spacing.md) {
             // Section header
             HStack {
                 Text(selectedFilter == .all ? "Recent Claims" : selectedFilter.rawValue)
@@ -169,17 +174,17 @@ struct HomeDashboardView: View {
 
                 Spacer()
 
-                HStack(spacing: AppTheme.Spacing.md) {
+                HStack(spacing: PaulDavisTheme.Spacing.md) {
                     Button(action: { showingLinkEstimate = true }) {
                         Label("Link", systemImage: "link")
                             .font(.subheadline.weight(.medium))
-                            .foregroundStyle(AppTheme.Colors.secondary)
+                            .foregroundStyle(PaulDavisTheme.Colors.secondary)
                     }
 
                     Button(action: { showingNewClaim = true }) {
-                        Label("New", systemImage: AppTheme.Icons.add)
+                        Label("New", systemImage: PaulDavisTheme.Icons.add)
                             .font(.subheadline.weight(.medium))
-                            .foregroundStyle(AppTheme.Colors.primary)
+                            .foregroundStyle(PaulDavisTheme.Colors.primary)
                     }
                 }
             }
@@ -191,7 +196,7 @@ struct HomeDashboardView: View {
                     onCreateClaim: { showingNewClaim = true }
                 )
             } else {
-                LazyVStack(spacing: AppTheme.Spacing.md) {
+                LazyVStack(spacing: PaulDavisTheme.Spacing.md) {
                     ForEach(filteredClaims) { claim in
                         NavigationLink(value: claim) {
                             EnhancedClaimCard(claim: claim, viewModel: viewModel)
@@ -246,7 +251,7 @@ private struct UrgentBanner: View {
     
     var body: some View {
         Button(action: action) {
-            HStack(spacing: AppTheme.Spacing.md) {
+            HStack(spacing: PaulDavisTheme.Spacing.md) {
                 Image(systemName: icon)
                     .font(.title2)
                     .foregroundStyle(.orange)
@@ -260,11 +265,11 @@ private struct UrgentBanner: View {
                     .font(.title3)
                     .foregroundStyle(.orange)
             }
-            .padding(AppTheme.Spacing.md)
+            .padding(PaulDavisTheme.Spacing.md)
             .background(Color.orange.opacity(0.1))
-            .continuousCornerRadius(AppTheme.Radius.md)
+            .continuousCornerRadius(PaulDavisTheme.Radius.md)
             .overlay(
-                RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous)
+                RoundedRectangle(cornerRadius: PaulDavisTheme.Radius.md, style: .continuous)
                     .strokeBorder(Color.orange.opacity(0.3), lineWidth: 1)
             )
         }
@@ -281,7 +286,7 @@ private struct StatCard: View {
     let color: Color
     
     var body: some View {
-        VStack(spacing: AppTheme.Spacing.sm) {
+        VStack(spacing: PaulDavisTheme.Spacing.sm) {
             Image(systemName: icon)
                 .font(.title2)
                 .foregroundStyle(color)
@@ -294,10 +299,10 @@ private struct StatCard: View {
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, AppTheme.Spacing.md)
-        .background(AppTheme.Colors.cardBackground)
-        .continuousCornerRadius(AppTheme.Radius.md)
-        .appShadow(AppTheme.Shadow.sm)
+        .padding(.vertical, PaulDavisTheme.Spacing.md)
+        .background(PaulDavisTheme.Colors.cardBackground)
+        .continuousCornerRadius(PaulDavisTheme.Radius.md)
+        .appShadow(PaulDavisTheme.Shadow.sm)
     }
 }
 
@@ -316,12 +321,12 @@ private struct FilterPill: View {
                 Text(filter.rawValue)
                     .font(.subheadline.weight(.medium))
             }
-            .padding(.horizontal, AppTheme.Spacing.md)
-            .padding(.vertical, AppTheme.Spacing.sm)
-            .background(isSelected ? AppTheme.Colors.primary : AppTheme.Colors.cardBackground)
+            .padding(.horizontal, PaulDavisTheme.Spacing.md)
+            .padding(.vertical, PaulDavisTheme.Spacing.sm)
+            .background(isSelected ? PaulDavisTheme.Colors.primary : PaulDavisTheme.Colors.cardBackground)
             .foregroundStyle(isSelected ? .white : .primary)
-            .continuousCornerRadius(AppTheme.Radius.full)
-            .appShadow(isSelected ? AppTheme.Shadow.sm : AppTheme.Shadow.sm)
+            .continuousCornerRadius(PaulDavisTheme.Radius.full)
+            .appShadow(isSelected ? PaulDavisTheme.Shadow.sm : PaulDavisTheme.Shadow.sm)
         }
     }
 }
@@ -335,7 +340,7 @@ private struct EnhancedClaimCard: View {
     @State private var showingSyncAlert = false
     
     var body: some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+        VStack(alignment: .leading, spacing: PaulDavisTheme.Spacing.md) {
             // Header row
             HStack {
                 // Loss type icon
@@ -344,7 +349,7 @@ private struct EnhancedClaimCard: View {
                     .foregroundStyle(claim.lossType.color)
                     .frame(width: 40, height: 40)
                     .background(claim.lossType.color.opacity(0.15))
-                    .continuousCornerRadius(AppTheme.Radius.sm)
+                    .continuousCornerRadius(PaulDavisTheme.Radius.sm)
                 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(claim.displayName)
@@ -378,7 +383,7 @@ private struct EnhancedClaimCard: View {
             }
             
             // Stats row
-            HStack(spacing: AppTheme.Spacing.lg) {
+            HStack(spacing: PaulDavisTheme.Spacing.lg) {
                 ClaimStatItem(icon: "square.split.bottomrightquarter", text: "\(claim.roomCount) rooms")
                 
                 if claim.damageCount > 0 {
@@ -393,7 +398,7 @@ private struct EnhancedClaimCard: View {
             }
             
             // Action buttons
-            HStack(spacing: AppTheme.Spacing.sm) {
+            HStack(spacing: PaulDavisTheme.Spacing.sm) {
                 ActionButton(
                     icon: claim.syncStatus == .pending ? "arrow.triangle.2.circlepath" : "arrow.right",
                     label: claim.syncStatus == .pending ? "Sync" : "Continue",
@@ -426,10 +431,10 @@ private struct EnhancedClaimCard: View {
                 }
             }
         }
-        .padding(AppTheme.Spacing.md)
-        .background(AppTheme.Colors.cardBackground)
-        .continuousCornerRadius(AppTheme.Radius.md)
-        .appShadow(AppTheme.Shadow.sm)
+        .padding(PaulDavisTheme.Spacing.md)
+        .background(PaulDavisTheme.Colors.cardBackground)
+        .continuousCornerRadius(PaulDavisTheme.Radius.md)
+        .appShadow(PaulDavisTheme.Shadow.sm)
     }
     
     @ViewBuilder
@@ -499,11 +504,11 @@ private struct ActionButton: View {
                 Text(label)
                     .font(.caption.weight(.medium))
             }
-            .padding(.horizontal, AppTheme.Spacing.md)
-            .padding(.vertical, AppTheme.Spacing.sm)
-            .background(isPrimary ? AppTheme.Colors.primary : AppTheme.Colors.surface)
+            .padding(.horizontal, PaulDavisTheme.Spacing.md)
+            .padding(.vertical, PaulDavisTheme.Spacing.sm)
+            .background(isPrimary ? PaulDavisTheme.Colors.primary : PaulDavisTheme.Colors.surface)
             .foregroundStyle(isPrimary ? .white : .primary)
-            .continuousCornerRadius(AppTheme.Radius.sm)
+            .continuousCornerRadius(PaulDavisTheme.Radius.sm)
         }
         .buttonStyle(.plain)
     }
@@ -516,12 +521,12 @@ private struct EmptyClaimsView: View {
     let onCreateClaim: () -> Void
     
     var body: some View {
-        VStack(spacing: AppTheme.Spacing.lg) {
+        VStack(spacing: PaulDavisTheme.Spacing.lg) {
             Image(systemName: filter == .all ? "doc.text" : "tray")
                 .font(.system(size: 64))
                 .foregroundStyle(.tertiary)
             
-            VStack(spacing: AppTheme.Spacing.xs) {
+            VStack(spacing: PaulDavisTheme.Spacing.xs) {
                 Text(emptyTitle)
                     .font(.headline)
                 
@@ -533,18 +538,18 @@ private struct EmptyClaimsView: View {
             
             if filter == .all {
                 Button(action: onCreateClaim) {
-                    Label("Create Your First Claim", systemImage: AppTheme.Icons.add)
+                    Label("Create Your First Claim", systemImage: PaulDavisTheme.Icons.add)
                         .font(.headline)
-                        .padding(.horizontal, AppTheme.Spacing.xl)
-                        .padding(.vertical, AppTheme.Spacing.md)
-                        .background(AppTheme.Colors.primary)
+                        .padding(.horizontal, PaulDavisTheme.Spacing.xl)
+                        .padding(.vertical, PaulDavisTheme.Spacing.md)
+                        .background(PaulDavisTheme.Colors.primary)
                         .foregroundStyle(.white)
-                        .continuousCornerRadius(AppTheme.Radius.md)
+                        .continuousCornerRadius(PaulDavisTheme.Radius.md)
                 }
             }
         }
         .frame(maxWidth: .infinity)
-        .padding(AppTheme.Spacing.xxl)
+        .padding(PaulDavisTheme.Spacing.xxl)
     }
     
     private var emptyTitle: String {

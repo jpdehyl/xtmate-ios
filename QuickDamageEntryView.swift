@@ -21,9 +21,9 @@ struct QuickDamageEntryView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: AppTheme.Spacing.xl) {
+                VStack(spacing: PaulDavisTheme.Spacing.xl) {
                     // Damage Type Selection
-                    VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+                    VStack(alignment: .leading, spacing: PaulDavisTheme.Spacing.md) {
                         Text("Damage Type")
                             .font(.headline)
                         
@@ -33,7 +33,7 @@ struct QuickDamageEntryView: View {
                                 GridItem(.flexible()),
                                 GridItem(.flexible())
                             ],
-                            spacing: AppTheme.Spacing.md
+                            spacing: PaulDavisTheme.Spacing.md
                         ) {
                             ForEach(DamageType.allCases.filter { $0 != .other }, id: \.self) { type in
                                 DamageTypeButton(
@@ -49,11 +49,11 @@ struct QuickDamageEntryView: View {
                     Divider()
                     
                     // Severity Selection
-                    VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+                    VStack(alignment: .leading, spacing: PaulDavisTheme.Spacing.md) {
                         Text("Severity")
                             .font(.headline)
                         
-                        HStack(spacing: AppTheme.Spacing.md) {
+                        HStack(spacing: PaulDavisTheme.Spacing.md) {
                             ForEach(DamageSeverity.allCases, id: \.self) { severity in
                                 SeverityButton(
                                     severity: severity,
@@ -67,7 +67,7 @@ struct QuickDamageEntryView: View {
                     Divider()
                     
                     // Affected Surfaces
-                    VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+                    VStack(alignment: .leading, spacing: PaulDavisTheme.Spacing.md) {
                         Text("Affected Surfaces")
                             .font(.headline)
                         
@@ -77,7 +77,7 @@ struct QuickDamageEntryView: View {
                                 GridItem(.flexible()),
                                 GridItem(.flexible())
                             ],
-                            spacing: AppTheme.Spacing.md
+                            spacing: PaulDavisTheme.Spacing.md
                         ) {
                             ForEach([SurfaceType.floor, .wall, .ceiling], id: \.self) { surface in
                                 SurfaceButton(
@@ -99,14 +99,14 @@ struct QuickDamageEntryView: View {
                     Divider()
                     
                     // Photos & Voice Note
-                    VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+                    VStack(alignment: .leading, spacing: PaulDavisTheme.Spacing.md) {
                         Text("Documentation")
                             .font(.headline)
                         
-                        HStack(spacing: AppTheme.Spacing.md) {
+                        HStack(spacing: PaulDavisTheme.Spacing.md) {
                             // Photo button
                             DocumentationButton(
-                                icon: AppTheme.Icons.photo,
+                                icon: PaulDavisTheme.Icons.photo,
                                 label: "Add Photos",
                                 badge: photos.isEmpty ? nil : "\(photos.count)",
                                 color: .blue,
@@ -130,25 +130,25 @@ struct QuickDamageEntryView: View {
                     }
                     
                     // Optional text notes
-                    VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
+                    VStack(alignment: .leading, spacing: PaulDavisTheme.Spacing.sm) {
                         Text("Additional Notes (Optional)")
                             .font(.subheadline.weight(.medium))
                             .foregroundStyle(.secondary)
                         
                         TextEditor(text: $notes)
                             .frame(height: 100)
-                            .padding(AppTheme.Spacing.sm)
-                            .background(AppTheme.Colors.surface)
-                            .continuousCornerRadius(AppTheme.Radius.md)
+                            .padding(PaulDavisTheme.Spacing.sm)
+                            .background(PaulDavisTheme.Colors.surface)
+                            .continuousCornerRadius(PaulDavisTheme.Radius.md)
                             .overlay(
-                                RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous)
+                                RoundedRectangle(cornerRadius: PaulDavisTheme.Radius.md, style: .continuous)
                                     .strokeBorder(Color.secondary.opacity(0.2), lineWidth: 1)
                             )
                     }
                 }
-                .padding(AppTheme.Spacing.lg)
+                .padding(PaulDavisTheme.Spacing.lg)
             }
-            .background(AppTheme.Colors.background)
+            .background(PaulDavisTheme.Colors.background)
             .navigationTitle("Add Damage")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -189,7 +189,7 @@ private struct DamageTypeButton: View {
     
     var body: some View {
         Button(action: onTap) {
-            VStack(spacing: AppTheme.Spacing.sm) {
+            VStack(spacing: PaulDavisTheme.Spacing.sm) {
                 Image(systemName: type.icon)
                     .font(.title)
                     .foregroundStyle(isSelected ? .white : type.color)
@@ -200,12 +200,12 @@ private struct DamageTypeButton: View {
             }
             .frame(width: size, height: size)
             .background(isSelected ? type.color : type.color.opacity(0.15))
-            .continuousCornerRadius(AppTheme.Radius.md)
+            .continuousCornerRadius(PaulDavisTheme.Radius.md)
             .overlay(
-                RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous)
+                RoundedRectangle(cornerRadius: PaulDavisTheme.Radius.md, style: .continuous)
                     .strokeBorder(isSelected ? type.color : Color.clear, lineWidth: 2)
             )
-            .appShadow(AppTheme.Shadow.sm)
+            .appShadow(PaulDavisTheme.Shadow.sm)
         }
         .buttonStyle(.plain)
     }
@@ -220,7 +220,7 @@ private struct SeverityButton: View {
     
     var body: some View {
         Button(action: onTap) {
-            VStack(spacing: AppTheme.Spacing.xs) {
+            VStack(spacing: PaulDavisTheme.Spacing.xs) {
                 Circle()
                     .fill(isSelected ? severity.color : severity.color.opacity(0.3))
                     .frame(width: 24, height: 24)
@@ -234,11 +234,11 @@ private struct SeverityButton: View {
                     .foregroundStyle(isSelected ? .primary : .secondary)
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, AppTheme.Spacing.md)
-            .background(isSelected ? severity.color.opacity(0.1) : AppTheme.Colors.cardBackground)
-            .continuousCornerRadius(AppTheme.Radius.md)
+            .padding(.vertical, PaulDavisTheme.Spacing.md)
+            .background(isSelected ? severity.color.opacity(0.1) : PaulDavisTheme.Colors.cardBackground)
+            .continuousCornerRadius(PaulDavisTheme.Radius.md)
             .overlay(
-                RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous)
+                RoundedRectangle(cornerRadius: PaulDavisTheme.Radius.md, style: .continuous)
                     .strokeBorder(isSelected ? severity.color : Color.clear, lineWidth: 2)
             )
         }
@@ -256,23 +256,23 @@ private struct SurfaceButton: View {
     
     var body: some View {
         Button(action: onTap) {
-            VStack(spacing: AppTheme.Spacing.sm) {
+            VStack(spacing: PaulDavisTheme.Spacing.sm) {
                 Image(systemName: surface.icon)
                     .font(.title)
-                    .foregroundStyle(isSelected ? .white : AppTheme.Colors.primary)
+                    .foregroundStyle(isSelected ? .white : PaulDavisTheme.Colors.primary)
                 
                 Text(surface.rawValue)
                     .font(.caption.weight(.medium))
                     .foregroundStyle(isSelected ? .white : .primary)
             }
             .frame(width: size, height: size)
-            .background(isSelected ? AppTheme.Colors.primary : AppTheme.Colors.primary.opacity(0.15))
-            .continuousCornerRadius(AppTheme.Radius.md)
+            .background(isSelected ? PaulDavisTheme.Colors.primary : PaulDavisTheme.Colors.primary.opacity(0.15))
+            .continuousCornerRadius(PaulDavisTheme.Radius.md)
             .overlay(
-                RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous)
-                    .strokeBorder(isSelected ? AppTheme.Colors.primary : Color.clear, lineWidth: 2)
+                RoundedRectangle(cornerRadius: PaulDavisTheme.Radius.md, style: .continuous)
+                    .strokeBorder(isSelected ? PaulDavisTheme.Colors.primary : Color.clear, lineWidth: 2)
             )
-            .appShadow(AppTheme.Shadow.sm)
+            .appShadow(PaulDavisTheme.Shadow.sm)
         }
         .buttonStyle(.plain)
     }
@@ -289,7 +289,7 @@ private struct DocumentationButton: View {
     
     var body: some View {
         Button(action: onTap) {
-            HStack(spacing: AppTheme.Spacing.sm) {
+            HStack(spacing: PaulDavisTheme.Spacing.sm) {
                 ZStack(alignment: .topTrailing) {
                     Image(systemName: icon)
                         .font(.title2)
@@ -301,7 +301,7 @@ private struct DocumentationButton: View {
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
                             .background(Color.red)
-                            .continuousCornerRadius(AppTheme.Radius.full)
+                            .continuousCornerRadius(PaulDavisTheme.Radius.full)
                             .offset(x: 8, y: -8)
                     }
                 }
@@ -311,11 +311,11 @@ private struct DocumentationButton: View {
                     .lineLimit(1)
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, AppTheme.Spacing.md)
+            .padding(.vertical, PaulDavisTheme.Spacing.md)
             .foregroundStyle(.white)
             .background(color)
-            .continuousCornerRadius(AppTheme.Radius.md)
-            .appShadow(AppTheme.Shadow.sm)
+            .continuousCornerRadius(PaulDavisTheme.Radius.md)
+            .appShadow(PaulDavisTheme.Shadow.sm)
         }
         .buttonStyle(.plain)
     }

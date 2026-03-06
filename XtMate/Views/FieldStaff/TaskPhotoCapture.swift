@@ -30,7 +30,7 @@ struct TaskPhotoCapture: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+        VStack(alignment: .leading, spacing: PaulDavisTheme.Spacing.md) {
             // Header
             HStack {
                 Image(systemName: "camera.fill")
@@ -52,7 +52,7 @@ struct TaskPhotoCapture: View {
                 GridItem(.flexible()),
                 GridItem(.flexible()),
                 GridItem(.flexible())
-            ], spacing: AppTheme.Spacing.sm) {
+            ], spacing: PaulDavisTheme.Spacing.sm) {
                 // Add photo button (if under max)
                 if selectedPhotos.count < maxPhotos {
                     AddPhotoButton(action: { showingActionSheet = true })
@@ -122,7 +122,7 @@ private struct AddPhotoButton: View {
 
     var body: some View {
         Button(action: action) {
-            VStack(spacing: AppTheme.Spacing.sm) {
+            VStack(spacing: PaulDavisTheme.Spacing.sm) {
                 Image(systemName: "plus.circle.fill")
                     .font(.system(size: 28))
                     .foregroundColor(.blue)
@@ -134,7 +134,7 @@ private struct AddPhotoButton: View {
             .frame(maxWidth: .infinity)
             .frame(height: 80)
             .background(Color.blue.opacity(0.1))
-            .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.sm))
+            .clipShape(RoundedRectangle(cornerRadius: PaulDavisTheme.Radius.sm))
         }
         .buttonStyle(PlainButtonStyle())
     }
@@ -155,7 +155,7 @@ private struct TaskPhotoThumbnail: View {
                     .resizable()
                     .scaledToFill()
                     .frame(height: 80)
-                    .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.sm))
+                    .clipShape(RoundedRectangle(cornerRadius: PaulDavisTheme.Radius.sm))
             }
             .buttonStyle(PlainButtonStyle())
 

@@ -152,7 +152,7 @@ XtMate/
 
 The iOS app syncs data with the XtMate web platform:
 - **Development**: `http://localhost:3001/api`
-- **Production**: `https://xtmate.vercel.app/api`
+- **Production**: `https://xtmate-v3.vercel.app/api`
 
 ### API Endpoints
 - `POST /claims` - Create/update claims

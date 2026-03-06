@@ -74,7 +74,7 @@ class SyncService: ObservableObject {
         // For physical device: user must set custom URL via settings
         return "http://localhost:3000/api"
         #else
-        return "https://xtmate.vercel.app/api"
+        return "https://xtmate-v3.vercel.app/api"
         #endif
     }
 

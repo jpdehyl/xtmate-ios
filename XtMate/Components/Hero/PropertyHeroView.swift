@@ -20,7 +20,7 @@ struct PropertyHeroView: View {
         GeometryReader { geometry in
             ZStack {
                 // Background
-                AppTheme.Colors.background
+                PaulDavisTheme.Colors.background
 
                 if rooms.isEmpty {
                     // Empty state
@@ -49,7 +49,7 @@ struct PropertyHeroView: View {
                             onToggle: onToggleViewMode
                         )
                     }
-                    .padding(AppTheme.Spacing.md)
+                    .padding(PaulDavisTheme.Spacing.md)
 
                     Spacer()
 
@@ -59,15 +59,15 @@ struct PropertyHeroView: View {
                             RoomCountBadge(count: rooms.count)
                             Spacer()
                         }
-                        .padding(AppTheme.Spacing.md)
+                        .padding(PaulDavisTheme.Spacing.md)
                     }
                 }
             }
         }
         .frame(height: 280)
-        .background(AppTheme.Colors.background)
-        .continuousCornerRadius(AppTheme.Radius.lg)
-        .appShadow(AppTheme.Shadow.md)
+        .background(PaulDavisTheme.Colors.background)
+        .continuousCornerRadius(PaulDavisTheme.Radius.lg)
+        .appShadow(PaulDavisTheme.Shadow.md)
     }
 }
 
@@ -77,7 +77,7 @@ private struct EmptyHeroView: View {
     var onCapture: (() -> Void)?
 
     var body: some View {
-        VStack(spacing: AppTheme.Spacing.lg) {
+        VStack(spacing: PaulDavisTheme.Spacing.lg) {
             // Illustration
             ZStack {
                 // House outline
@@ -91,7 +91,7 @@ private struct EmptyHeroView: View {
                     .foregroundStyle(.secondary)
             }
 
-            VStack(spacing: AppTheme.Spacing.xs) {
+            VStack(spacing: PaulDavisTheme.Spacing.xs) {
                 Text("Scan Your First Room")
                     .font(.headline)
 
@@ -99,20 +99,20 @@ private struct EmptyHeroView: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
-                    .padding(.horizontal, AppTheme.Spacing.xl)
+                    .padding(.horizontal, PaulDavisTheme.Spacing.xl)
             }
 
             Button(action: { onCapture?() }) {
                 HStack {
-                    Image(systemName: AppTheme.Icons.scan)
+                    Image(systemName: PaulDavisTheme.Icons.scan)
                     Text("Start Capture")
                 }
                 .font(.headline)
                 .foregroundStyle(.white)
-                .padding(.horizontal, AppTheme.Spacing.xxl)
-                .padding(.vertical, AppTheme.Spacing.md)
-                .background(AppTheme.Colors.primary)
-                .continuousCornerRadius(AppTheme.Radius.md)
+                .padding(.horizontal, PaulDavisTheme.Spacing.xxl)
+                .padding(.vertical, PaulDavisTheme.Spacing.md)
+                .background(PaulDavisTheme.Colors.primary)
+                .continuousCornerRadius(PaulDavisTheme.Radius.md)
             }
         }
     }
@@ -135,10 +135,10 @@ private struct FloorPlanVisualization: View {
                 // Simple grid layout of rooms
                 LazyVGrid(
                     columns: [
-                        GridItem(.flexible(), spacing: AppTheme.Spacing.sm),
-                        GridItem(.flexible(), spacing: AppTheme.Spacing.sm)
+                        GridItem(.flexible(), spacing: PaulDavisTheme.Spacing.sm),
+                        GridItem(.flexible(), spacing: PaulDavisTheme.Spacing.sm)
                     ],
-                    spacing: AppTheme.Spacing.sm
+                    spacing: PaulDavisTheme.Spacing.sm
                 ) {
                     ForEach(rooms) { room in
                         RoomTile(
@@ -150,15 +150,15 @@ private struct FloorPlanVisualization: View {
                         )
                     }
                 }
-                .padding(AppTheme.Spacing.lg)
+                .padding(PaulDavisTheme.Spacing.lg)
             }
         }
     }
 
     private func calculateRoomSize(for availableSize: CGSize, roomCount: Int) -> CGSize {
         let columns: CGFloat = 2
-        let padding: CGFloat = AppTheme.Spacing.lg * 2
-        let spacing: CGFloat = AppTheme.Spacing.sm
+        let padding: CGFloat = PaulDavisTheme.Spacing.lg * 2
+        let spacing: CGFloat = PaulDavisTheme.Spacing.sm
 
         let width = (availableSize.width - padding - spacing) / columns
         let rows = ceil(CGFloat(roomCount) / columns)
@@ -189,10 +189,10 @@ private struct RoomTile: View {
                                 .stroke(roomColor, lineWidth: isSelected ? 3 : 1)
                         )
                 } else {
-                    RoundedRectangle(cornerRadius: AppTheme.Radius.sm, style: .continuous)
+                    RoundedRectangle(cornerRadius: PaulDavisTheme.Radius.sm, style: .continuous)
                         .fill(roomColor.opacity(0.3))
                         .overlay(
-                            RoundedRectangle(cornerRadius: AppTheme.Radius.sm, style: .continuous)
+                            RoundedRectangle(cornerRadius: PaulDavisTheme.Radius.sm, style: .continuous)
                                 .strokeBorder(roomColor, lineWidth: isSelected ? 3 : 1)
                         )
                 }
@@ -274,10 +274,10 @@ private struct ViewModeToggle: View {
                     .fontWeight(.medium)
             }
             .foregroundStyle(.secondary)
-            .padding(.horizontal, AppTheme.Spacing.sm)
-            .padding(.vertical, AppTheme.Spacing.xs)
+            .padding(.horizontal, PaulDavisTheme.Spacing.sm)
+            .padding(.vertical, PaulDavisTheme.Spacing.xs)
             .background(.ultraThinMaterial)
-            .continuousCornerRadius(AppTheme.Radius.sm)
+            .continuousCornerRadius(PaulDavisTheme.Radius.sm)
         }
     }
 }
@@ -289,16 +289,16 @@ private struct RoomCountBadge: View {
 
     var body: some View {
         HStack(spacing: 4) {
-            Image(systemName: AppTheme.Icons.room)
+            Image(systemName: PaulDavisTheme.Icons.room)
             Text("\(count) room\(count == 1 ? "" : "s")")
                 .font(.caption)
                 .fontWeight(.medium)
         }
         .foregroundStyle(.secondary)
-        .padding(.horizontal, AppTheme.Spacing.sm)
-        .padding(.vertical, AppTheme.Spacing.xs)
+        .padding(.horizontal, PaulDavisTheme.Spacing.sm)
+        .padding(.vertical, PaulDavisTheme.Spacing.xs)
         .background(.ultraThinMaterial)
-        .continuousCornerRadius(AppTheme.Radius.sm)
+        .continuousCornerRadius(PaulDavisTheme.Radius.sm)
     }
 }
 

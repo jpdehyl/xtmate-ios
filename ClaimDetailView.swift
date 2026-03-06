@@ -40,12 +40,12 @@ struct ClaimDetailView: View {
                             // Navigate to room detail
                         }
                     )
-                    .padding(.horizontal, AppTheme.Spacing.lg)
-                    .padding(.top, AppTheme.Spacing.sm)
+                    .padding(.horizontal, PaulDavisTheme.Spacing.lg)
+                    .padding(.top, PaulDavisTheme.Spacing.sm)
                 }
                 
                 // Main content
-                VStack(spacing: AppTheme.Spacing.lg) {
+                VStack(spacing: PaulDavisTheme.Spacing.lg) {
                     // Claim Info Card (Collapsible)
                     ClaimInfoCard(
                         claimNumber: viewModel.claim?.claimNumber,
@@ -81,35 +81,35 @@ struct ClaimDetailView: View {
                     // Quick Actions Section
                     quickActionsSection
                 }
-                .padding(.horizontal, AppTheme.Spacing.lg)
-                .padding(.vertical, AppTheme.Spacing.lg)
+                .padding(.horizontal, PaulDavisTheme.Spacing.lg)
+                .padding(.vertical, PaulDavisTheme.Spacing.lg)
             }
         }
-        .background(AppTheme.Colors.background)
+        .background(PaulDavisTheme.Colors.background)
         .navigationTitle(viewModel.claim?.displayName ?? "Claim")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Menu {
                     Button(action: { viewModel.syncClaim() }) {
-                        Label("Sync to Web", systemImage: AppTheme.Icons.sync)
+                        Label("Sync to Web", systemImage: PaulDavisTheme.Icons.sync)
                     }
                     
                     Button(action: {}) {
-                        Label("Export PDF", systemImage: AppTheme.Icons.export)
+                        Label("Export PDF", systemImage: PaulDavisTheme.Icons.export)
                     }
                     
                     Divider()
                     
                     Button(action: {}) {
-                        Label("Edit Claim Info", systemImage: AppTheme.Icons.edit)
+                        Label("Edit Claim Info", systemImage: PaulDavisTheme.Icons.edit)
                     }
                     
                     Button(role: .destructive, action: {}) {
-                        Label("Delete Claim", systemImage: AppTheme.Icons.delete)
+                        Label("Delete Claim", systemImage: PaulDavisTheme.Icons.delete)
                     }
                 } label: {
-                    Image(systemName: AppTheme.Icons.more)
+                    Image(systemName: PaulDavisTheme.Icons.more)
                 }
             }
         }
@@ -176,11 +176,11 @@ struct ClaimDetailView: View {
         .overlay(alignment: .bottomTrailing) {
             if viewModel.rooms.isEmpty {
                 FloatingActionButton(
-                    icon: AppTheme.Icons.scan,
+                    icon: PaulDavisTheme.Icons.scan,
                     label: "Scan Room",
                     action: { showingRoomCapture = true }
                 )
-                .padding(AppTheme.Spacing.xl)
+                .padding(PaulDavisTheme.Spacing.xl)
             }
         }
     }
@@ -188,16 +188,16 @@ struct ClaimDetailView: View {
     // MARK: - Rooms Section
     
     private var roomsSection: some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+        VStack(alignment: .leading, spacing: PaulDavisTheme.Spacing.md) {
             // Section header
             HStack {
-                Label("Rooms", systemImage: AppTheme.Icons.room)
+                Label("Rooms", systemImage: PaulDavisTheme.Icons.room)
                     .font(.headline)
                 
                 Spacer()
                 
                 Button(action: { showingRoomCapture = true }) {
-                    Label("Scan", systemImage: AppTheme.Icons.scan)
+                    Label("Scan", systemImage: PaulDavisTheme.Icons.scan)
                         .font(.subheadline)
                 }
             }
@@ -206,7 +206,7 @@ struct ClaimDetailView: View {
             if viewModel.rooms.isEmpty {
                 EmptyRoomsView(onScanRoom: { showingRoomCapture = true })
             } else {
-                LazyVStack(spacing: AppTheme.Spacing.sm) {
+                LazyVStack(spacing: PaulDavisTheme.Spacing.sm) {
                     ForEach(viewModel.rooms) { room in
                         NavigationLink(value: room.id) {
                             RoomListCard(
@@ -233,7 +233,7 @@ struct ClaimDetailView: View {
     // MARK: - Quick Actions Section
     
     private var quickActionsSection: some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+        VStack(alignment: .leading, spacing: PaulDavisTheme.Spacing.md) {
             Text("Quick Actions")
                 .font(.headline)
             
@@ -242,10 +242,10 @@ struct ClaimDetailView: View {
                     GridItem(.flexible()),
                     GridItem(.flexible())
                 ],
-                spacing: AppTheme.Spacing.md
+                spacing: PaulDavisTheme.Spacing.md
             ) {
                 QuickActionCard(
-                    icon: AppTheme.Icons.photo,
+                    icon: PaulDavisTheme.Icons.photo,
                     label: "Take Photos",
                     color: .blue,
                     action: {}
@@ -323,12 +323,12 @@ private struct EmptyRoomsView: View {
     let onScanRoom: () -> Void
     
     var body: some View {
-        VStack(spacing: AppTheme.Spacing.md) {
+        VStack(spacing: PaulDavisTheme.Spacing.md) {
             Image(systemName: "viewfinder.circle")
                 .font(.system(size: 48))
                 .foregroundStyle(.secondary)
             
-            VStack(spacing: AppTheme.Spacing.xs) {
+            VStack(spacing: PaulDavisTheme.Spacing.xs) {
                 Text("No Rooms Scanned")
                     .font(.subheadline.weight(.medium))
                 
@@ -338,19 +338,19 @@ private struct EmptyRoomsView: View {
             }
             
             Button(action: onScanRoom) {
-                Label("Scan Room", systemImage: AppTheme.Icons.scan)
+                Label("Scan Room", systemImage: PaulDavisTheme.Icons.scan)
                     .font(.subheadline.weight(.medium))
-                    .padding(.horizontal, AppTheme.Spacing.lg)
-                    .padding(.vertical, AppTheme.Spacing.sm)
-                    .background(AppTheme.Colors.primary)
+                    .padding(.horizontal, PaulDavisTheme.Spacing.lg)
+                    .padding(.vertical, PaulDavisTheme.Spacing.sm)
+                    .background(PaulDavisTheme.Colors.primary)
                     .foregroundStyle(.white)
-                    .continuousCornerRadius(AppTheme.Radius.sm)
+                    .continuousCornerRadius(PaulDavisTheme.Radius.sm)
             }
         }
         .frame(maxWidth: .infinity)
-        .padding(AppTheme.Spacing.xxl)
-        .background(AppTheme.Colors.cardBackground)
-        .continuousCornerRadius(AppTheme.Radius.md)
+        .padding(PaulDavisTheme.Spacing.xxl)
+        .background(PaulDavisTheme.Colors.cardBackground)
+        .continuousCornerRadius(PaulDavisTheme.Radius.md)
     }
 }
 
@@ -363,14 +363,14 @@ private struct RoomListCard: View {
     let onAddDamage: () -> Void
     
     var body: some View {
-        HStack(spacing: AppTheme.Spacing.md) {
+        HStack(spacing: PaulDavisTheme.Spacing.md) {
             // Room icon
             Image(systemName: room.icon)
                 .font(.title2)
                 .foregroundStyle(room.damageCount > 0 ? .orange : .blue)
                 .frame(width: 44, height: 44)
                 .background((room.damageCount > 0 ? Color.orange : Color.blue).opacity(0.15))
-                .continuousCornerRadius(AppTheme.Radius.sm)
+                .continuousCornerRadius(PaulDavisTheme.Radius.sm)
             
             // Room info
             VStack(alignment: .leading, spacing: 4) {
@@ -385,7 +385,7 @@ private struct RoomListCard: View {
                     }
                 }
                 
-                HStack(spacing: AppTheme.Spacing.sm) {
+                HStack(spacing: PaulDavisTheme.Spacing.sm) {
                     Text("\(Int(room.squareFeet)) SF")
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -404,16 +404,16 @@ private struct RoomListCard: View {
             Button(action: onAddDamage) {
                 Image(systemName: "plus.circle.fill")
                     .font(.title3)
-                    .foregroundStyle(AppTheme.Colors.primary)
+                    .foregroundStyle(PaulDavisTheme.Colors.primary)
             }
             .buttonStyle(.plain)
         }
-        .padding(AppTheme.Spacing.md)
-        .background(isSelected ? AppTheme.Colors.primary.opacity(0.1) : AppTheme.Colors.cardBackground)
-        .continuousCornerRadius(AppTheme.Radius.md)
+        .padding(PaulDavisTheme.Spacing.md)
+        .background(isSelected ? PaulDavisTheme.Colors.primary.opacity(0.1) : PaulDavisTheme.Colors.cardBackground)
+        .continuousCornerRadius(PaulDavisTheme.Radius.md)
         .overlay(
-            RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous)
-                .strokeBorder(isSelected ? AppTheme.Colors.primary : Color.clear, lineWidth: 2)
+            RoundedRectangle(cornerRadius: PaulDavisTheme.Radius.md, style: .continuous)
+                .strokeBorder(isSelected ? PaulDavisTheme.Colors.primary : Color.clear, lineWidth: 2)
         )
     }
 }
@@ -428,13 +428,13 @@ private struct QuickActionCard: View {
     
     var body: some View {
         Button(action: action) {
-            VStack(spacing: AppTheme.Spacing.sm) {
+            VStack(spacing: PaulDavisTheme.Spacing.sm) {
                 Image(systemName: icon)
                     .font(.title)
                     .foregroundStyle(color)
                     .frame(width: 56, height: 56)
                     .background(color.opacity(0.15))
-                    .continuousCornerRadius(AppTheme.Radius.md)
+                    .continuousCornerRadius(PaulDavisTheme.Radius.md)
                 
                 Text(label)
                     .font(.caption.weight(.medium))
@@ -443,10 +443,10 @@ private struct QuickActionCard: View {
                     .lineLimit(2)
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, AppTheme.Spacing.md)
-            .background(AppTheme.Colors.cardBackground)
-            .continuousCornerRadius(AppTheme.Radius.md)
-            .appShadow(AppTheme.Shadow.sm)
+            .padding(.vertical, PaulDavisTheme.Spacing.md)
+            .background(PaulDavisTheme.Colors.cardBackground)
+            .continuousCornerRadius(PaulDavisTheme.Radius.md)
+            .appShadow(PaulDavisTheme.Shadow.sm)
         }
         .buttonStyle(.plain)
     }
@@ -461,18 +461,18 @@ private struct FloatingActionButton: View {
     
     var body: some View {
         Button(action: action) {
-            HStack(spacing: AppTheme.Spacing.sm) {
+            HStack(spacing: PaulDavisTheme.Spacing.sm) {
                 Image(systemName: icon)
                     .font(.title3)
                 Text(label)
                     .font(.subheadline.weight(.semibold))
             }
-            .padding(.horizontal, AppTheme.Spacing.lg)
-            .padding(.vertical, AppTheme.Spacing.md)
-            .background(AppTheme.Colors.primary)
+            .padding(.horizontal, PaulDavisTheme.Spacing.lg)
+            .padding(.vertical, PaulDavisTheme.Spacing.md)
+            .background(PaulDavisTheme.Colors.primary)
             .foregroundStyle(.white)
-            .continuousCornerRadius(AppTheme.Radius.full)
-            .appShadow(AppTheme.Shadow.lg)
+            .continuousCornerRadius(PaulDavisTheme.Radius.full)
+            .appShadow(PaulDavisTheme.Shadow.lg)
         }
     }
 }

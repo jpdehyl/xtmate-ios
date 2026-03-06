@@ -31,7 +31,7 @@ struct WorkOrderDetailView: View {
     
     var body: some View {
         ScrollView {
-            VStack(spacing: AppTheme.Spacing.xl) {
+            VStack(spacing: PaulDavisTheme.Spacing.xl) {
                 // Property header
                 PropertyHeaderCard(order: localOrder)
                 
@@ -59,7 +59,7 @@ struct WorkOrderDetailView: View {
                 // Complete button (when all items done)
                 if localOrder.allItemsComplete && localOrder.status != .completed {
                     Button(action: { showingSignature = true }) {
-                        HStack(spacing: AppTheme.Spacing.md) {
+                        HStack(spacing: PaulDavisTheme.Spacing.md) {
                             Image(systemName: "signature")
                                 .font(.title2)
                             Text("Complete & Get Signature")
@@ -70,9 +70,9 @@ struct WorkOrderDetailView: View {
                         .frame(height: 56) // 56pt touch target
                         .background(Color.green)
                         .foregroundColor(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.md))
+                        .clipShape(RoundedRectangle(cornerRadius: PaulDavisTheme.Radius.md))
                     }
-                    .padding(.horizontal, AppTheme.Spacing.lg)
+                    .padding(.horizontal, PaulDavisTheme.Spacing.lg)
                 }
                 
                 // Notes section
@@ -80,7 +80,7 @@ struct WorkOrderDetailView: View {
                     NotesCard(title: "Work Order Notes", notes: notes)
                 }
             }
-            .padding(.vertical, AppTheme.Spacing.lg)
+            .padding(.vertical, PaulDavisTheme.Spacing.lg)
         }
         .navigationTitle("Work Order")
         .navigationBarTitleDisplayMode(.inline)
@@ -320,7 +320,7 @@ struct PropertyHeaderCard: View {
     let order: WorkOrder
     
     var body: some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+        VStack(alignment: .leading, spacing: PaulDavisTheme.Spacing.md) {
             // Address
             Text(order.propertyAddress)
                 .font(.title2)
@@ -329,7 +329,7 @@ struct PropertyHeaderCard: View {
             // Estimate info
             if let estimate = order.estimate {
                 if let insuredName = estimate.insuredName, !insuredName.isEmpty {
-                    HStack(spacing: AppTheme.Spacing.sm) {
+                    HStack(spacing: PaulDavisTheme.Spacing.sm) {
                         Image(systemName: "person.fill")
                             .font(.body)
                         Text(insuredName)
@@ -339,7 +339,7 @@ struct PropertyHeaderCard: View {
                 }
                 
                 if let claimNumber = estimate.claimNumber, !claimNumber.isEmpty {
-                    HStack(spacing: AppTheme.Spacing.sm) {
+                    HStack(spacing: PaulDavisTheme.Spacing.sm) {
                         Image(systemName: "doc.text")
                             .font(.body)
                         Text("Claim: \(claimNumber)")
@@ -364,20 +364,20 @@ struct PropertyHeaderCard: View {
                             .font(.caption)
                             .fontWeight(.bold)
                     }
-                    .padding(.horizontal, AppTheme.Spacing.sm)
-                    .padding(.vertical, AppTheme.Spacing.xs)
+                    .padding(.horizontal, PaulDavisTheme.Spacing.sm)
+                    .padding(.vertical, PaulDavisTheme.Spacing.xs)
                     .background(order.priority == .urgent ? Color.red.opacity(0.15) : Color.orange.opacity(0.15))
                     .foregroundColor(order.priority == .urgent ? .red : .orange)
                     .clipShape(Capsule())
                 }
             }
         }
-        .padding(AppTheme.Spacing.lg)
+        .padding(PaulDavisTheme.Spacing.lg)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(AppTheme.Colors.cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous))
+        .background(PaulDavisTheme.Colors.cardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: PaulDavisTheme.Radius.md, style: .continuous))
         .shadow(color: .black.opacity(0.05), radius: 2, y: 1)
-        .padding(.horizontal, AppTheme.Spacing.lg)
+        .padding(.horizontal, PaulDavisTheme.Spacing.lg)
     }
 }
 
@@ -399,7 +399,7 @@ struct TimeTrackingCard: View {
     }
     
     var body: some View {
-        VStack(spacing: AppTheme.Spacing.lg) {
+        VStack(spacing: PaulDavisTheme.Spacing.lg) {
             // Title
             HStack {
                 Image(systemName: "clock.fill")
@@ -413,7 +413,7 @@ struct TimeTrackingCard: View {
             
             // Elapsed time display
             if order.isClockedIn {
-                VStack(spacing: AppTheme.Spacing.sm) {
+                VStack(spacing: PaulDavisTheme.Spacing.sm) {
                     Text(formattedElapsedTime)
                         .font(.system(size: 48, weight: .bold, design: .monospaced))
                         .foregroundColor(.orange)
@@ -428,10 +428,10 @@ struct TimeTrackingCard: View {
                             .foregroundColor(.secondary)
                     }
                 }
-                .padding(.vertical, AppTheme.Spacing.md)
+                .padding(.vertical, PaulDavisTheme.Spacing.md)
             } else if let totalHours = order.totalHours {
                 // Show completed time
-                VStack(spacing: AppTheme.Spacing.sm) {
+                VStack(spacing: PaulDavisTheme.Spacing.sm) {
                     Text(String(format: "%.2f hrs", totalHours))
                         .font(.system(size: 36, weight: .bold))
                         .foregroundColor(.green)
@@ -440,7 +440,7 @@ struct TimeTrackingCard: View {
                         .font(.body)
                         .foregroundColor(.secondary)
                 }
-                .padding(.vertical, AppTheme.Spacing.md)
+                .padding(.vertical, PaulDavisTheme.Spacing.md)
             }
             
             // Clock in/out button
@@ -452,7 +452,7 @@ struct TimeTrackingCard: View {
                         onClockIn()
                     }
                 }) {
-                    HStack(spacing: AppTheme.Spacing.md) {
+                    HStack(spacing: PaulDavisTheme.Spacing.md) {
                         if isProcessing {
                             ProgressView()
                                 .progressViewStyle(CircularProgressViewStyle(tint: .white))
@@ -468,16 +468,16 @@ struct TimeTrackingCard: View {
                     .frame(height: 56) // 56pt touch target
                     .background(order.isClockedIn ? Color.red : Color.green)
                     .foregroundColor(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.md))
+                    .clipShape(RoundedRectangle(cornerRadius: PaulDavisTheme.Radius.md))
                 }
                 .disabled(isProcessing)
             }
         }
-        .padding(AppTheme.Spacing.lg)
-        .background(AppTheme.Colors.cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous))
+        .padding(PaulDavisTheme.Spacing.lg)
+        .background(PaulDavisTheme.Colors.cardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: PaulDavisTheme.Radius.md, style: .continuous))
         .shadow(color: .black.opacity(0.05), radius: 2, y: 1)
-        .padding(.horizontal, AppTheme.Spacing.lg)
+        .padding(.horizontal, PaulDavisTheme.Spacing.lg)
     }
 }
 
@@ -492,7 +492,7 @@ struct TaskChecklistCard: View {
     let isProcessing: Bool
 
     var body: some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.lg) {
+        VStack(alignment: .leading, spacing: PaulDavisTheme.Spacing.lg) {
             // Title with progress
             HStack {
                 Image(systemName: "checklist")
@@ -527,7 +527,7 @@ struct TaskChecklistCard: View {
             .frame(height: 8)
 
             // Task list
-            VStack(spacing: AppTheme.Spacing.sm) {
+            VStack(spacing: PaulDavisTheme.Spacing.sm) {
                 ForEach(items.sorted(by: { $0.order < $1.order })) { item in
                     TaskItemRow(
                         item: item,
@@ -539,11 +539,11 @@ struct TaskChecklistCard: View {
                 }
             }
         }
-        .padding(AppTheme.Spacing.lg)
-        .background(AppTheme.Colors.cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous))
+        .padding(PaulDavisTheme.Spacing.lg)
+        .background(PaulDavisTheme.Colors.cardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: PaulDavisTheme.Radius.md, style: .continuous))
         .shadow(color: .black.opacity(0.05), radius: 2, y: 1)
-        .padding(.horizontal, AppTheme.Spacing.lg)
+        .padding(.horizontal, PaulDavisTheme.Spacing.lg)
     }
 }
 
@@ -558,7 +558,7 @@ struct TaskItemRow: View {
     let isProcessing: Bool
 
     var body: some View {
-        HStack(spacing: AppTheme.Spacing.md) {
+        HStack(spacing: PaulDavisTheme.Spacing.md) {
             // Checkbox button
             Button(action: { onToggle(item) }) {
                 ZStack {
@@ -619,10 +619,10 @@ struct TaskItemRow: View {
                     .clipShape(Capsule())
             }
         }
-        .padding(AppTheme.Spacing.md)
+        .padding(PaulDavisTheme.Spacing.md)
         .frame(minHeight: 56) // 56pt touch target
         .background(item.status == .completed ? Color.green.opacity(0.05) : Color.clear)
-        .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.sm))
+        .clipShape(RoundedRectangle(cornerRadius: PaulDavisTheme.Radius.sm))
     }
 }
 
@@ -633,7 +633,7 @@ struct NotesCard: View {
     let notes: String
     
     var body: some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+        VStack(alignment: .leading, spacing: PaulDavisTheme.Spacing.md) {
             HStack {
                 Image(systemName: "note.text")
                     .font(.title2)
@@ -647,12 +647,12 @@ struct NotesCard: View {
                 .font(.body)
                 .foregroundColor(.secondary)
         }
-        .padding(AppTheme.Spacing.lg)
+        .padding(PaulDavisTheme.Spacing.lg)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(AppTheme.Colors.cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous))
+        .background(PaulDavisTheme.Colors.cardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: PaulDavisTheme.Radius.md, style: .continuous))
         .shadow(color: .black.opacity(0.05), radius: 2, y: 1)
-        .padding(.horizontal, AppTheme.Spacing.lg)
+        .padding(.horizontal, PaulDavisTheme.Spacing.lg)
     }
 }
 
@@ -668,14 +668,14 @@ struct BreakEntrySheet: View {
     
     var body: some View {
         NavigationStack {
-            VStack(spacing: AppTheme.Spacing.xl) {
+            VStack(spacing: PaulDavisTheme.Spacing.xl) {
                 Text("How long was your break?")
                     .font(.title2)
                     .fontWeight(.semibold)
-                    .padding(.top, AppTheme.Spacing.xl)
+                    .padding(.top, PaulDavisTheme.Spacing.xl)
                 
                 // Break options
-                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: AppTheme.Spacing.md) {
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: PaulDavisTheme.Spacing.md) {
                     ForEach(breakOptions, id: \.self) { minutes in
                         Button(action: {
                             breakMinutes = minutes
@@ -689,11 +689,11 @@ struct BreakEntrySheet: View {
                                 .frame(height: 56) // 56pt touch target
                                 .background(breakMinutes == minutes ? Color.blue : Color.gray.opacity(0.1))
                                 .foregroundColor(breakMinutes == minutes ? .white : .primary)
-                                .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.md))
+                                .clipShape(RoundedRectangle(cornerRadius: PaulDavisTheme.Radius.md))
                         }
                     }
                 }
-                .padding(.horizontal, AppTheme.Spacing.lg)
+                .padding(.horizontal, PaulDavisTheme.Spacing.lg)
                 
                 Spacer()
                 
@@ -706,10 +706,10 @@ struct BreakEntrySheet: View {
                         .frame(height: 56)
                         .background(Color.red)
                         .foregroundColor(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.md))
+                        .clipShape(RoundedRectangle(cornerRadius: PaulDavisTheme.Radius.md))
                 }
-                .padding(.horizontal, AppTheme.Spacing.lg)
-                .padding(.bottom, AppTheme.Spacing.xl)
+                .padding(.horizontal, PaulDavisTheme.Spacing.lg)
+                .padding(.bottom, PaulDavisTheme.Spacing.xl)
             }
             .navigationTitle("Break Time")
             .navigationBarTitleDisplayMode(.inline)
@@ -737,9 +737,9 @@ struct TaskPhotoSheet: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: AppTheme.Spacing.lg) {
+                VStack(alignment: .leading, spacing: PaulDavisTheme.Spacing.lg) {
                     // Task info
-                    VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
+                    VStack(alignment: .leading, spacing: PaulDavisTheme.Spacing.sm) {
                         Text("Task")
                             .font(.caption)
                             .foregroundColor(.secondary)
@@ -758,27 +758,27 @@ struct TaskPhotoSheet: View {
                                 .clipShape(Capsule())
                         }
                     }
-                    .padding(AppTheme.Spacing.lg)
+                    .padding(PaulDavisTheme.Spacing.lg)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(AppTheme.Colors.cardBackground)
-                    .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.md))
+                    .background(PaulDavisTheme.Colors.cardBackground)
+                    .clipShape(RoundedRectangle(cornerRadius: PaulDavisTheme.Radius.md))
 
                     // Photo capture
                     TaskPhotoCapture(
                         selectedPhotos: $localPhotos,
                         maxPhotos: 5
                     )
-                    .padding(AppTheme.Spacing.lg)
-                    .background(AppTheme.Colors.cardBackground)
-                    .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.md))
+                    .padding(PaulDavisTheme.Spacing.lg)
+                    .background(PaulDavisTheme.Colors.cardBackground)
+                    .clipShape(RoundedRectangle(cornerRadius: PaulDavisTheme.Radius.md))
 
                     // Hint text
                     Text("Take photos to document task completion. Photos help verify work quality and support insurance claims.")
                         .font(.caption)
                         .foregroundColor(.secondary)
-                        .padding(.horizontal, AppTheme.Spacing.md)
+                        .padding(.horizontal, PaulDavisTheme.Spacing.md)
                 }
-                .padding(AppTheme.Spacing.lg)
+                .padding(PaulDavisTheme.Spacing.lg)
             }
             .navigationTitle("Completion Photos")
             .navigationBarTitleDisplayMode(.inline)

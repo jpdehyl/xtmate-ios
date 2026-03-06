@@ -19,7 +19,7 @@ struct SignatureCaptureView: View {
         NavigationStack {
             VStack(spacing: 0) {
                 // Instructions
-                VStack(spacing: AppTheme.Spacing.sm) {
+                VStack(spacing: PaulDavisTheme.Spacing.sm) {
                     Image(systemName: "signature")
                         .font(.system(size: 40))
                         .foregroundColor(.blue)
@@ -33,10 +33,10 @@ struct SignatureCaptureView: View {
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
                 }
-                .padding(.vertical, AppTheme.Spacing.xl)
+                .padding(.vertical, PaulDavisTheme.Spacing.xl)
                 
                 // Signature canvas
-                VStack(spacing: AppTheme.Spacing.md) {
+                VStack(spacing: PaulDavisTheme.Spacing.md) {
                     SignatureCanvasRepresentable(
                         canvasView: $canvasView,
                         hasDrawn: $hasDrawn
@@ -44,10 +44,10 @@ struct SignatureCaptureView: View {
                     .frame(height: 200)
                     .background(Color.white)
                     .overlay(
-                        RoundedRectangle(cornerRadius: AppTheme.Radius.md)
+                        RoundedRectangle(cornerRadius: PaulDavisTheme.Radius.md)
                             .stroke(hasDrawn ? Color.blue : Color.gray.opacity(0.3), lineWidth: 2)
                     )
-                    .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.md))
+                    .clipShape(RoundedRectangle(cornerRadius: PaulDavisTheme.Radius.md))
                     
                     // Signature line
                     HStack {
@@ -61,11 +61,11 @@ struct SignatureCaptureView: View {
                             .fill(Color.gray.opacity(0.3))
                             .frame(height: 1)
                     }
-                    .padding(.horizontal, AppTheme.Spacing.lg)
+                    .padding(.horizontal, PaulDavisTheme.Spacing.lg)
                     
                     // Clear button
                     Button(action: clearSignature) {
-                        HStack(spacing: AppTheme.Spacing.sm) {
+                        HStack(spacing: PaulDavisTheme.Spacing.sm) {
                             Image(systemName: "arrow.counterclockwise")
                             Text("Clear")
                         }
@@ -75,12 +75,12 @@ struct SignatureCaptureView: View {
                     .opacity(hasDrawn ? 1 : 0.3)
                     .disabled(!hasDrawn)
                 }
-                .padding(.horizontal, AppTheme.Spacing.lg)
+                .padding(.horizontal, PaulDavisTheme.Spacing.lg)
                 
                 Spacer()
                 
                 // Name field
-                VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
+                VStack(alignment: .leading, spacing: PaulDavisTheme.Spacing.sm) {
                     Text("Print Name")
                         .font(.subheadline)
                         .fontWeight(.medium)
@@ -88,20 +88,20 @@ struct SignatureCaptureView: View {
                     
                     TextField("Customer's full name", text: $signedName)
                         .font(.title3)
-                        .padding(AppTheme.Spacing.md)
+                        .padding(PaulDavisTheme.Spacing.md)
                         .frame(height: 56) // 56pt touch target
                         .background(Color(uiColor: .secondarySystemGroupedBackground))
-                        .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.md))
+                        .clipShape(RoundedRectangle(cornerRadius: PaulDavisTheme.Radius.md))
                         .focused($isNameFieldFocused)
                         .textContentType(.name)
                         .autocorrectionDisabled()
                 }
-                .padding(.horizontal, AppTheme.Spacing.lg)
-                .padding(.bottom, AppTheme.Spacing.lg)
+                .padding(.horizontal, PaulDavisTheme.Spacing.lg)
+                .padding(.bottom, PaulDavisTheme.Spacing.lg)
                 
                 // Done button
                 Button(action: complete) {
-                    HStack(spacing: AppTheme.Spacing.md) {
+                    HStack(spacing: PaulDavisTheme.Spacing.md) {
                         Image(systemName: "checkmark.circle.fill")
                             .font(.title2)
                         Text("Complete Work Order")
@@ -112,11 +112,11 @@ struct SignatureCaptureView: View {
                     .frame(height: 56) // 56pt touch target
                     .background(isValid ? Color.green : Color.gray)
                     .foregroundColor(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.md))
+                    .clipShape(RoundedRectangle(cornerRadius: PaulDavisTheme.Radius.md))
                 }
                 .disabled(!isValid)
-                .padding(.horizontal, AppTheme.Spacing.lg)
-                .padding(.bottom, AppTheme.Spacing.xl)
+                .padding(.horizontal, PaulDavisTheme.Spacing.lg)
+                .padding(.bottom, PaulDavisTheme.Spacing.xl)
             }
             .navigationTitle("Customer Signature")
             .navigationBarTitleDisplayMode(.inline)
@@ -229,7 +229,7 @@ struct FallbackSignatureView: View {
         NavigationStack {
             VStack(spacing: 0) {
                 // Instructions
-                VStack(spacing: AppTheme.Spacing.sm) {
+                VStack(spacing: PaulDavisTheme.Spacing.sm) {
                     Image(systemName: "signature")
                         .font(.system(size: 40))
                         .foregroundColor(.blue)
@@ -238,10 +238,10 @@ struct FallbackSignatureView: View {
                         .font(.title2)
                         .fontWeight(.bold)
                 }
-                .padding(.vertical, AppTheme.Spacing.xl)
+                .padding(.vertical, PaulDavisTheme.Spacing.xl)
                 
                 // Signature canvas
-                VStack(spacing: AppTheme.Spacing.md) {
+                VStack(spacing: PaulDavisTheme.Spacing.md) {
                     Canvas { context, size in
                         // Draw all completed lines
                         for line in lines {
@@ -280,17 +280,17 @@ struct FallbackSignatureView: View {
                             }
                     )
                     .overlay(
-                        RoundedRectangle(cornerRadius: AppTheme.Radius.md)
+                        RoundedRectangle(cornerRadius: PaulDavisTheme.Radius.md)
                             .stroke(hasDrawn ? Color.blue : Color.gray.opacity(0.3), lineWidth: 2)
                     )
-                    .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.md))
+                    .clipShape(RoundedRectangle(cornerRadius: PaulDavisTheme.Radius.md))
                     
                     // Clear button
                     Button(action: {
                         lines = []
                         currentLine = []
                     }) {
-                        HStack(spacing: AppTheme.Spacing.sm) {
+                        HStack(spacing: PaulDavisTheme.Spacing.sm) {
                             Image(systemName: "arrow.counterclockwise")
                             Text("Clear")
                         }
@@ -300,12 +300,12 @@ struct FallbackSignatureView: View {
                     .opacity(hasDrawn ? 1 : 0.3)
                     .disabled(!hasDrawn)
                 }
-                .padding(.horizontal, AppTheme.Spacing.lg)
+                .padding(.horizontal, PaulDavisTheme.Spacing.lg)
                 
                 Spacer()
                 
                 // Name field
-                VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
+                VStack(alignment: .leading, spacing: PaulDavisTheme.Spacing.sm) {
                     Text("Print Name")
                         .font(.subheadline)
                         .fontWeight(.medium)
@@ -313,14 +313,14 @@ struct FallbackSignatureView: View {
                     
                     TextField("Customer's full name", text: $signedName)
                         .font(.title3)
-                        .padding(AppTheme.Spacing.md)
+                        .padding(PaulDavisTheme.Spacing.md)
                         .frame(height: 56)
                         .background(Color(uiColor: .secondarySystemGroupedBackground))
-                        .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.md))
+                        .clipShape(RoundedRectangle(cornerRadius: PaulDavisTheme.Radius.md))
                         .focused($isNameFieldFocused)
                 }
-                .padding(.horizontal, AppTheme.Spacing.lg)
-                .padding(.bottom, AppTheme.Spacing.lg)
+                .padding(.horizontal, PaulDavisTheme.Spacing.lg)
+                .padding(.bottom, PaulDavisTheme.Spacing.lg)
                 
                 // Done button
                 Button(action: complete) {
@@ -331,11 +331,11 @@ struct FallbackSignatureView: View {
                         .frame(height: 56)
                         .background(isValid ? Color.green : Color.gray)
                         .foregroundColor(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.md))
+                        .clipShape(RoundedRectangle(cornerRadius: PaulDavisTheme.Radius.md))
                 }
                 .disabled(!isValid)
-                .padding(.horizontal, AppTheme.Spacing.lg)
-                .padding(.bottom, AppTheme.Spacing.xl)
+                .padding(.horizontal, PaulDavisTheme.Spacing.lg)
+                .padding(.bottom, PaulDavisTheme.Spacing.xl)
             }
             .navigationTitle("Customer Signature")
             .navigationBarTitleDisplayMode(.inline)
